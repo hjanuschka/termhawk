@@ -87,8 +87,24 @@ var table = blessed.listtable( {
         }
     }
 } )
-table.on('select', function(item) {
-  console.error(item);
+
+var msg = blessed.message({
+  parent: screen,
+  border: 'line',
+  height: 'shrink',
+  width: 'half',
+  top: 'center',
+  left: 'center',
+  label: ' {blue-fg}Message{/blue-fg} ',
+  tags: true,
+  keys: true,
+  hidden: true,
+  vi: true
+});
+
+
+table.on('select', function(item,index) {
+  msg.display("Selected " + JSON.stringify(state.notifications[index-1]));
 })
 
 //screen.append( table )
