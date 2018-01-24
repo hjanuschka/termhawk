@@ -64,14 +64,10 @@ var table = blessed.listtable( {
     'tags': true,
     'keys': true,
     'vi': true,
-    'left': 0,
-    'top': 0,
     'align': 'left',
     'wrap': true,
-    'right': 0,
-		'bottom': 2,
-    'width': 'shrink',
     'mouse': true,
+    'width': '100%',
     'style': {
         'border': { 'fg': 'cyan' },
         'header': {
