@@ -1,7 +1,7 @@
 var blessed = require( 'blessed' )
 var github = require( 'octonode' )
-var notificationView = require("./notificationview.js")
-var BottomBar = require("./bottombar.js")
+var notificationView = require('./notificationview.js')
+var BottomBar = require('./bottombar.js')
 
 // Create a screen object.
 var screen = blessed.screen( { 'smartCSR': true, autoPadding: false,
@@ -31,13 +31,13 @@ var box = blessed.box( {
 
 screen.append( box )
 
-var notify_view = new notificationView(screen, client);
-notify_view.createTable();
+var notify_view = new notificationView(screen, client)
+notify_view.createTable()
 
 
 
-var bottom_bar = new BottomBar(screen);
-bottom_bar.createView();
+var bottom_bar = new BottomBar(screen)
+bottom_bar.createView()
 
 
 
@@ -45,16 +45,16 @@ bottom_bar.createView();
 
 //Global Hotkeys
 
-  screen.key(['e'], function(ch, key) {
-    notify_view.remove();
-  })
-  screen.key([
+screen.key(['e'], function(ch, key) {
+    notify_view.remove()
+})
+screen.key([
     'w'
-  ], function(ch, key) {
-    box.toggle();
-    table.focus();
-    screen.render();
-  })
+], function(ch, key) {
+    box.toggle()
+    table.focus()
+    screen.render()
+})
 // Quit on Escape, q, or Control-C.
 screen.key( [
     'escape',

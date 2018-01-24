@@ -3,6 +3,10 @@ module.exports = {
         "node": true
     },
     "extends": "eslint:recommended",
+    "env": {
+      "es6": true,
+      "amd": true,
+    },
     "rules": {
         "indent": [
             "error",
