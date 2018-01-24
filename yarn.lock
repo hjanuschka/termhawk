@@ -364,7 +364,17 @@ marked-terminal@^1.5.0:
     lodash.assign "^4.2.0"
     node-emoji "^1.4.1"
 
-marked@^0.3.3:
+marked-terminal@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/marked-terminal/-/marked-terminal-2.0.0.tgz#5eaf568be66f686541afa52a558280310a31de2d"
+  dependencies:
+    cardinal "^1.0.0"
+    chalk "^1.1.3"
+    cli-table "^0.3.1"
+    lodash.assign "^4.2.0"
+    node-emoji "^1.4.1"
+
+marked@^0.3.12, marked@^0.3.3:
   version "0.3.12"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.12.tgz#7cf25ff2252632f3fe2406bde258e94eee927519"
 

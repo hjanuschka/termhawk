@@ -71,11 +71,29 @@ class NotificationView {
   }
   events() {
     var self = this;
+    //ghnotification.markAsRead(callback);
     this.table.key(["r"], function(ch, key) {
+      var index =  self.table.selected;
+      var not = self.state.notifications[index-1];
+      not.removed=true;
+
+      var notification = self.client.notification(not.id);
+        notification.markAsRead(function(err, read) {
+          //FIXME PATCH list remember selection and so on
+        })
+
+    })
+
+    this.table.key(["C-r"], function(ch, key) {
       self.loadData();
     })
     this.table.on('select', function(item,index) {
-    var issue = new IssueView(self.root, 123);
+    var not = self.state.notifications[index-1];
+
+
+      var matches = not.subject.url.match(/.*\/([0-9]+$)/);
+      var id = matches[1]
+    var issue = new IssueView(self.root,self.client, {repo:not.repository.full_name, id: id, not: not});
     issue.createView();
     issue.focus()
 })
