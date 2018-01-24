@@ -69,8 +69,8 @@ var table = blessed.listtable( {
     'align': 'left',
     'wrap': true,
     'right': 0,
-    "height": "100%",
-    'width': "shrink",
+    'height': '100%',
+    'width': 'shrink',
     'mouse': true,
     'style': {
         'border': { 'fg': 'cyan' },
@@ -83,28 +83,53 @@ var table = blessed.listtable( {
         'cell': {
             'fg': 'white',
             'bg': 'blue',
-            'selected': { 'bg': 'green', 'fg': "black" }
+            'selected': { 'bg': 'green', 'fg': 'black' }
         }
     }
 } )
 
 var msg = blessed.message({
-  parent: screen,
-  border: 'line',
-  height: 'shrink',
-  width: 'half',
-  top: 'center',
-  left: 'center',
-  label: ' {blue-fg}Message{/blue-fg} ',
-  tags: true,
-  keys: true,
-  hidden: true,
-  vi: true
-});
+    parent: screen,
+    border: 'line',
+    height: 'shrink',
+    width: 'half',
+    top: 'center',
+    left: 'center',
+    label: ' {blue-fg}Message{/blue-fg} ',
+    tags: true,
+    keys: true,
+    hidden: true,
+    vi: true
+})
 
 
 table.on('select', function(item,index) {
-  msg.display("Selected " + JSON.stringify(state.notifications[index-1]));
+    var box1 = blessed.box( {
+        'border': { 'type': 'line' },
+        'parent': box,
+        'content': JSON.stringify(state.notifications[index-1]),
+        'height': '50%',
+        'top': 'center',
+        'left': 'center',
+        'width': '50%',
+        'style': {
+            'bg': 'magenta',
+            'border': { 'fg': '#f0f0f0' },
+            'fg': 'white',
+            'hover': { 'bg': 'green' }
+        }
+    } )
+    box1.focus()
+    box1.key( [
+        'b'
+    ], function( ch, key ) {
+        box.remove(box1)
+				screen.render();
+return 1;
+    } )
+
+    screen.render()
+    //screen.append(box);
 })
 
 //screen.append( table )
