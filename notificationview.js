@@ -13,14 +13,23 @@ class NotificationView {
     reRender() {
         var data = [['repo', 'subject']]
 
+        this.table.setData( data )
         this.state.notifications.forEach( function(not) {
             data.push( [
                 not.repository.full_name,
                 not.subject.title
             ] )
+
         } )
         this.table.setData( data )
+        if(this.state.storeIndex !== false) {
 
+            this.table.select(this.state.storeIndex)
+            this.state.storeIndex = false
+
+        }
+
+        this.table.render()
         this.root.screen.render()
 
     }
@@ -75,21 +84,28 @@ class NotificationView {
         this.table.key(['r'], function(ch, key) {
             var index =  self.table.selected
             var not = self.state.notifications[index-1]
-            not.removed=true
 
+
+            if(!not || !not.id) {
+                return
+            }
+
+                self.state.notifications.splice(index-1, 1)
+                self.setState({notifications: self.state.notifications, storeIndex: index})
             var notification = self.client.notification(not.id)
             notification.markAsRead(function(err, read) {
                 //FIXME PATCH list remember selection and so on
+
             })
 
         })
 
         this.table.key(['C-r'], function(ch, key) {
             self.loadData()
+
         })
         this.table.on('select', function(item,index) {
             var not = self.state.notifications[index-1]
-
 
             var matches = not.subject.url.match(/.*\/([0-9]+$)/)
             var id = matches[1]
