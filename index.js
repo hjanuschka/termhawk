@@ -1,44 +1,18 @@
 var blessed = require( 'blessed' )
 var github = require( 'octonode' )
+var notificationView = require("./notificationview.js")
+var BottomBar = require("./bottombar.js")
 
 // Create a screen object.
 var screen = blessed.screen( { 'smartCSR': true, autoPadding: false,
     fullUnicode: true,
     warnings: true} )
 
-// screen.title = 'TermHawk';
-var client = github.client( process.env.github_token )
-var me = client.me()
-
-
-function reRender() {
-    box.content = 'aaA'
-    //		console.log('RENDER');
-    var data = [['repo', 'subject']]
-
-    state.notifications.forEach( function(not) {
-        data.push( [
-            not.repository.full_name,
-            not.subject.title
-        ] )
-    } )
-    table.setData( data )
-    screen.render()
-    table.render()
-}
-
-var state = {
-    'rerender': function() {
-        reRender()
-    }
-}
-
-me.notifications( {}, function( err, a ) {
-    state.notifications = a
-    state.rerender()
-} )
 
 screen.title = 'TermHawk'
+
+//FIXME gitlab!
+var client = github.client( process.env.github_token )
 
 // Create a box perfectly centered horizontally and vertically.
 var box = blessed.box( {
@@ -55,87 +29,32 @@ var box = blessed.box( {
     }
 } )
 
-//screen.append( box )
+screen.append( box )
 
-var table = blessed.listtable( {
-    'parent': box,
-    'data': [ [ 'Loading' ] ],
-    'border': 'line',
-    'tags': true,
-    'keys': true,
-    'vi': true,
-    'align': 'left',
-    'wrap': true,
-    'mouse': true,
-    'width': '100%',
-    'style': {
-        'border': { 'fg': 'cyan' },
-        'header': {
-            'fg': 'white',
-            'bg': 'orange',
-            'bold': true
-        },
-        'bg': 'blue',
-        'cell': {
-            'fg': 'white',
-            'bg': 'blue',
-            'selected': { 'bg': 'green', 'fg': 'black' }
-        }
-    }
-} )
+var notify_view = new notificationView(screen, client);
+notify_view.createTable();
 
-var bar = blessed.box({
-  parent: screen,
-  padding: 0,
-  bottom: 0,
-  border: 'bg',
-  width: '100%',
-  height: 'shrink',
-  mouse: true,
-  keys: true,
-  style: {
-    bg: 'green',
-  },
-	content: "test"
-});
+
+
+var bottom_bar = new BottomBar(screen);
+bottom_bar.createView();
 
 
 
 
-table.on('select', function(item,index) {
-    var box1 = blessed.box( {
-        'border': { 'type': 'line' },
-        'parent': box,
-        'content': JSON.stringify(state.notifications[index-1]),
-        'height': '50%',
-        'top': 'center',
-        'left': 'center',
-        'width': '50%',
-        'style': {
-            'bg': 'magenta',
-            'border': { 'fg': '#f0f0f0' },
-            'fg': 'white',
-            'hover': { 'bg': 'green' }
-        }
-    } )
-    box1.focus()
-    box1.key( [
-        'b'
-    ], function( ch, key ) {
-        box.remove(box1)
-        screen.render()
-        return 1
-    } )
 
-    screen.render()
-    //screen.append(box);
-})
+//Global Hotkeys
 
-//screen.append( table )
-
-// Append our box to the screen.
-
-
+  screen.key(['e'], function(ch, key) {
+    notify_view.remove();
+  })
+  screen.key([
+    'w'
+  ], function(ch, key) {
+    box.toggle();
+    table.focus();
+    screen.render();
+  })
 // Quit on Escape, q, or Control-C.
 screen.key( [
     'escape',
