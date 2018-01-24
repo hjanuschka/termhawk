@@ -69,7 +69,7 @@ var table = blessed.listtable( {
     'align': 'left',
     'wrap': true,
     'right': 0,
-    'height': '100%',
+		'bottom': 2,
     'width': 'shrink',
     'mouse': true,
     'style': {
@@ -88,19 +88,22 @@ var table = blessed.listtable( {
     }
 } )
 
-var msg = blessed.message({
-    parent: screen,
-    border: 'line',
-    height: 'shrink',
-    width: 'half',
-    top: 'center',
-    left: 'center',
-    label: ' {blue-fg}Message{/blue-fg} ',
-    tags: true,
-    keys: true,
-    hidden: true,
-    vi: true
-})
+var bar = blessed.box({
+  parent: screen,
+  padding: 0,
+  bottom: 0,
+  border: 'bg',
+  width: '100%',
+  height: 'shrink',
+  mouse: true,
+  keys: true,
+  style: {
+    bg: 'green',
+  },
+	content: "test"
+});
+
+
 
 
 table.on('select', function(item,index) {
@@ -124,8 +127,8 @@ table.on('select', function(item,index) {
         'b'
     ], function( ch, key ) {
         box.remove(box1)
-				screen.render();
-return 1;
+        screen.render()
+        return 1
     } )
 
     screen.render()
