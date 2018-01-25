@@ -1,7 +1,7 @@
 var blessed = require( 'blessed' )
-var github = require( 'octonode' )
 var notificationView = require('./notificationview.js')
 var BottomBar = require('./bottombar.js')
+var gitDriver = require("./github")
 
 // Create a screen object.
 var screen = blessed.screen( { 'smartCSR': true, autoPadding: false,
@@ -13,7 +13,8 @@ debug: true,
 screen.title = 'TermHawk'
 
 //FIXME gitlab!
-var client = github.client( process.env.github_token )
+var driver = new gitDriver();
+
 
 // Create a box perfectly centered horizontally and vertically.
 var box = blessed.box( {
@@ -32,7 +33,7 @@ var box = blessed.box( {
 
 screen.append( box )
 
-var notify_view = new notificationView(screen, client)
+var notify_view = new notificationView(screen, driver)
 notify_view.createTable()
 
 

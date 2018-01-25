@@ -7,10 +7,10 @@ var issuecomments = require('./issuecomments')
 
 
 class IssueView {
-    constructor(root, client, payload) {
+    constructor(root, driver, payload) {
         this.root = root
         this.payload = payload
-        this.client = client
+        this.driver = driver
         this.state = {
             issue: false
         }
@@ -24,11 +24,13 @@ class IssueView {
     }
     reRender() {
         var self = this
+
         if (self.state.issue) {
             marked.setOptions({
                 //  Define custom renderer
                 renderer: new TerminalRenderer()
             })
+
             var kind = 'Issue'
             var pr_info = ''
             if (this.state.is_pr) {
@@ -60,7 +62,10 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            this.state.comments.filter(function(n){ return n != undefined }).forEach(function(comment) {
+            /*
+            this.state.comments.filter(function(n) {
+                return n != undefined
+            }).forEach(function(comment) {
                 var reviewed = false
                 if (comment && comment.state) {
                     comment.created_at = comment.submitted_at
@@ -70,22 +75,22 @@ class IssueView {
                 cnt += '──────────────────────────────────────\n'
                 cnt += '{#00ff00-fg}User:{/} {underline}' + comment.user.login + '{/}\n'
                 if (reviewed) {
-                    cnt += "{white-bg}{black-fg}Review Added{/}: " + reviewed + "\n";
+                    cnt += '{white-bg}{black-fg}Review Added{/}: ' + reviewed + '\n'
                 }
                 cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
                 cnt += '\n'
 
                 if (comment.diff_hunk) {
-                    var diff_lines = comment.diff_hunk.split("\n");
+                    var diff_lines = comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
-                        var color = "{white-fg}"
+                        var color = '{white-fg}'
                         if (l.match(/^\-/)) {
-                            color = "{red-fg}"
+                            color = '{red-fg}'
                         }
                         if (l.match(/^\+/)) {
-                            color = "{green-fg}"
+                            color = '{green-fg}'
                         }
-                        cnt += color + l + "{/}\n"
+                        cnt += color + l + '{/}\n'
                         if (idx == comment.original_position) {
                             cnt += striptags(marked(comment.body)) + '\n'
                         }
@@ -94,11 +99,12 @@ class IssueView {
                 } else {
                     cnt += striptags(marked(comment.body)) + '\n'
                 }
-                self.root.screen.debug( JSON.stringify(comment, null, 2) );
+                self.root.screen.debug(JSON.stringify(comment, null, 2))
                 cnt += '\n'
             })
+            */
             self.box.setContent(cnt)
-                //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
+            //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 
 
 
@@ -147,15 +153,34 @@ class IssueView {
     }
     loadData() {
         var self = this
-        var type = 'issue'
-        var issueLoader = new issuecomments(this.client, this.payload.repo, this.payload.id)
-        issueLoader.load()
-            .then(function(issueInfo) {
-                var newState = self.state
-                newState.issue = issueInfo.detail
-                newState.is_pr = issueInfo.is_pr
-                newState.pr = issueInfo.pr
-                newState.comments = issueInfo.timeline
+        var newState = {}
+        self.driver.loadIssue(self.payload.repo, self.payload.id)
+            .then(function(issue) {
+                newState.issue = issue
+                return Promise.resolve()
+
+            })
+            .then(() => self.driver.loadPR(self.payload.repo, self.payload.id))
+            .then(function(pr) {
+                newState.pr = pr
+                return Promise.resolve()
+            })
+            .then(() => self.driver.loadPRReviews(self.payload.repo, self.payload.id))
+            .then(function(pr_reviews) {
+                newState.pr_reviews = pr_reviews
+                return Promise.resolve()
+            })
+            .then(() => self.driver.loadPRComments(self.payload.repo, self.payload.id))
+            .then(function(pr_comments) {
+                newState.pr_comments = pr_comments
+                return Promise.resolve()
+            })
+            .then(() => self.driver.loadIssueComments(self.payload.repo, self.payload.id))
+            .then(function(issue_comments) {
+                newState.issue_comments = issue_comments
+                return Promise.resolve()
+            })
+            .then(function() {
                 self.setState(newState)
             })
 
@@ -171,25 +196,20 @@ class IssueView {
         var data = [
             ['sha', 'commiter', 'message']
         ]
-        var pr = this.client.pr(this.payload.repo, this.payload.id)
-
-        fetch(this.state.pr.diff_url)
-            .then(function(res) {
-                return res.text()
-            })
+        this.driver.getDiff(this.payload.repo, this.payload.id)
             .then(function(diff_in) {
-                var diff = ""
-                diff_in.split("\n").forEach(function(l) {
-                    var color = "{white-fg}"
+                var diff = ''
+                diff_in.split('\n').forEach(function(l) {
+                    var color = '{white-fg}'
                     if (l.match(/^\-/)) {
-                        color = "{red-fg}"
+                        color = '{red-fg}'
                     }
                     if (l.match(/^\+/)) {
-                        color = "{green-fg}"
+                        color = '{green-fg}'
                     }
-                    diff += color + l + "{/}\n"
+                    diff += color + l + '{/}\n'
 
-                });
+                })
                 var diffBox = blessed.box({
                     'parent': self.root,
                     'border': 'line',
@@ -242,62 +262,65 @@ class IssueView {
         var data = [
             ['sha', 'commiter', 'message']
         ]
-        var pr = this.client.pr(this.payload.repo, this.payload.id)
-
-        pr.commits(function(error, commits) {
-            commits.forEach(function(commit) {
-                data.push([
-                    commit.commit.tree.sha.substring(0, 5),
-                    commit.commit.committer.name,
-                    commit.commit.message
-                ])
-            })
-            var commitList = blessed.listtable({
-                'parent': self.root,
-                'data': data,
-                'border': 'line',
-                'tags': true,
-                'keys': true,
-                'vi': true,
-                'align': 'left',
-                'wrap': true,
-                'left': 'center',
-                'top': 'center',
-                'height': '50%',
-                'mouse': true,
-                'width': '50%',
-                'style': {
-                    'border': {
-                        'fg': 'white'
-                    },
-                    'header': {
-                        'fg': 'black',
-                        'bg': '#FD971F',
-                        'bold': true
-                    },
-                    'bg': '#272822',
-                    'cell': {
-                        'fg': 'white',
+        this.driver.getCommitsForPR(this.payload.repo, this.payload.id)
+            .then(function(commits) {
+                //Requires
+                //sha
+                //commiter name
+                //message
+                commits.forEach(function(commit) {
+                    data.push([
+                        commit.sha.substring(0, 5),
+                        commit.commiter.name,
+                        commit.message
+                    ])
+                })
+                var commitList = blessed.listtable({
+                    'parent': self.root,
+                    'data': data,
+                    'border': 'line',
+                    'tags': true,
+                    'keys': true,
+                    'vi': true,
+                    'align': 'left',
+                    'wrap': true,
+                    'left': 'center',
+                    'top': 'center',
+                    'height': '50%',
+                    'mouse': true,
+                    'width': '50%',
+                    'style': {
+                        'border': {
+                            'fg': 'white'
+                        },
+                        'header': {
+                            'fg': 'black',
+                            'bg': '#FD971F',
+                            'bold': true
+                        },
                         'bg': '#272822',
-                        'selected': {
-                            'bg': '#FD971f',
-                            'fg': 'black'
+                        'cell': {
+                            'fg': 'white',
+                            'bg': '#272822',
+                            'selected': {
+                                'bg': '#FD971f',
+                                'fg': 'black'
+                            }
                         }
                     }
-                }
 
 
-            })
-            commitList.key(['h'], function() {
-                self.root.remove(commitList)
+                })
+                commitList.key(['h'], function() {
+                    self.root.remove(commitList)
+                    self.box.screen.render()
+                })
+
+
+                commitList.focus()
                 self.box.screen.render()
+
             })
-
-
-            commitList.focus()
-            self.box.screen.render()
-
-        })
     }
 
     events() {

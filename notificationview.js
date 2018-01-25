@@ -2,28 +2,32 @@ var blessed = require('blessed')
 var IssueView = require('./issueview')
 
 class NotificationView {
-    constructor(root, client) {
+    constructor(root, driver) {
         this.root = root
-        this.client = client
-        this.state = {storeIndex: false}
+        this.driver = driver
+        this.state = {
+            storeIndex: false
+        }
     }
     setState(state) {
         this.state = state
         this.reRender()
     }
     reRender() {
-        var data = [['repo', 'subject']]
+        var data = [
+            ['repo', 'subject']
+        ]
 
-        this.table.setData( data )
-        this.state.notifications.forEach( function(not) {
-            data.push( [
-                not.repository.full_name,
-                not.subject.title
-            ] )
+        this.table.setData(data)
+        this.state.notifications.forEach(function(not) {
+            data.push([
+                not.repo,
+                not.title
+            ])
 
-        } )
-        this.table.setData( data )
-        if(this.state.storeIndex !== false) {
+        })
+        this.table.setData(data)
+        if (this.state.storeIndex !== false) {
 
             this.table.select(this.state.storeIndex)
             this.state.storeIndex = false
@@ -36,17 +40,21 @@ class NotificationView {
     }
     loadData() {
         var self = this
-        var me = self.client.me()
-        //EMPTY out
-        me.notifications( {}, function( err, a ) {
-            self.setState({notifications: a, storeIndex: false})
-        } )
+        self.driver.getNotifications({})
+            .then(function(notifications) {
+                self.setState({
+                    notifications: notifications,
+                    storeIndex: false
+                })
+            })
 
     }
     createTable() {
-        this.table = blessed.listtable( {
+        this.table = blessed.listtable({
             'parent': this.root,
-            'data': [ [ 'Loading' ] ],
+            'data': [
+                ['Loading']
+            ],
             'border': 'line',
             'tags': true,
             'keys': true,
@@ -57,7 +65,9 @@ class NotificationView {
             'mouse': true,
             'width': '100%',
             'style': {
-                'border': { 'fg': 'white' },
+                'border': {
+                    'fg': 'white'
+                },
                 'header': {
                     'fg': 'black',
                     'bg': '#FD971F',
@@ -67,10 +77,13 @@ class NotificationView {
                 'cell': {
                     'fg': 'white',
                     'bg': '#272822',
-                    'selected': { 'bg': '#FD971f', 'fg': 'black' }
+                    'selected': {
+                        'bg': '#FD971f',
+                        'fg': 'black'
+                    }
                 }
             }
-        } )
+        })
         this.events()
         this.loadData()
 
@@ -81,23 +94,24 @@ class NotificationView {
     }
     events() {
         var self = this
-        //ghnotification.markAsRead(callback);
         this.table.key(['r'], function(ch, key) {
-            var index =  self.table.selected
-            var not = self.state.notifications[index-1]
+            var index = self.table.selected
+            var not = self.state.notifications[index - 1]
 
 
-            if(!not || !not.id) {
+            if (!not || !not.id) {
                 return
             }
 
-                self.state.notifications.splice(index-1, 1)
-                self.setState({notifications: self.state.notifications, storeIndex: index})
-            var notification = self.client.notification(not.id)
-            notification.markAsRead(function(err, read) {
-                //FIXME PATCH list remember selection and so on
-
+            self.state.notifications.splice(index - 1, 1)
+            self.setState({
+                notifications: self.state.notifications,
+                storeIndex: index
             })
+            self.driver.markNotificationAsRead(not.id)
+                .then(function(resp) {
+                    //FIXME feedback
+                })
 
         })
 
@@ -105,14 +119,16 @@ class NotificationView {
             self.loadData()
 
         })
-        this.table.on('select', function(item,index) {
-            var not = self.state.notifications[index-1]
+        this.table.on('select', function(item, index) {
+            var not = self.state.notifications[index - 1]
 
-            var matches = not.subject.url.match(/.*\/([0-9]+$)/)
-            var id = matches[1]
+            var id = not.target_id;
             //not.repository.full_name='hjanuschka/termhawk'
             //id=1;
-            var issue = new IssueView(self.root,self.client, {repo:not.repository.full_name, id: id, not: not})
+            var issue = new IssueView(self.root, self.driver, {
+                repo: not.repo,
+                id: id
+            })
             issue.createView()
             issue.focus()
         })
