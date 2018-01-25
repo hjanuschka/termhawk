@@ -1,6 +1,8 @@
 var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
+var striptags = require('striptags');
+
 
 class IssueView {
     constructor(root,client, payload) {
@@ -23,34 +25,37 @@ class IssueView {
             //  Define custom renderer
                 renderer: new TerminalRenderer()
             })
+            var kind = "Issue"
+            if(this.state.is_pr) kind = "Pull Request"
 
-            var cnt = "{#00ff00-fg}Issue:{/} {underline}" + this.state.issue.title + "{/}\n"
+            var cnt = "{#00ff00-fg}" + kind + ":{/} {underline}" + this.state.issue.title + "{/} #" + this.payload.id + "\n"
             cnt += "{#00ff00-fg}User:{/} {underline}" + this.state.issue.user.login + "{/}\n"
             cnt += "{#00ff00-fg}State:{/} {underline}" + this.state.issue.state + "{/}\n"
             cnt += "{#00ff00-fg}Created:{/} {underline}" + this.state.issue.created_at + "{/} Modified: {underline}" + this.state.issue.updated_at + "{/}\n"
-            cnt += "Labels: \n"
-
-            this.state.issue.labels.forEach(function(label) {
-                cnt += "{#" + label.color + "-bg}{white-fg}" + label.name + "{/},"
-            });
+            if(this.state.issue.labels) {
+              cnt += "Labels: \n"
+              this.state.issue.labels.forEach(function(label) {
+                  cnt += "{#" + label.color + "-bg}{white-fg}" + label.name + "{/},"
+              });
+              }
 
             cnt += '\n\n'
-            cnt += marked(this.state.issue.body)
+            cnt += striptags(marked(this.state.issue.body))
 
             cnt += "Comments: \n\n"
 
-            this.state.comments.forEach(function(comment) {
+            this.state.comments.reverse().forEach(function(comment) {
                 cnt += "\n";
             cnt += "──────────────────────────────────────\n"
             cnt += "{#00ff00-fg}User:{/} {underline}" + comment.user.login + "{/}\n"
             cnt += "{#00ff00-fg}Created:{/} {underline}" + comment.created_at + "{/} Modified: {underline}" + comment.updated_at + "{/}\n"
             cnt += "\n"
 
-                cnt += marked(comment.body) + "\n";
+                cnt += striptags(marked(comment.body)) + "\n";
                 cnt += "\n";
             });
             self.box.setContent(cnt)
-            //self.box.setContent(JSON.stringify(this.state.comments, null, 2))
+            //self.box.setContent(JSON.stringify(this.state.issue, null, 2))
 
           
 
@@ -95,7 +100,12 @@ class IssueView {
     }
     loadData() {
         var self = this
-        var issue = this.client.issue(this.payload.repo, this.payload.id)
+        var type = "issue";
+        self.state.is_pr=false
+        if(self.payload.not.subject.type == 'PullRequest') {
+          self.state.is_pr=true
+        }
+        var issue = this.client[type](this.payload.repo, this.payload.id)
         issue.info(function(error, issue_detail) {
             var newState = self.state;
             newState.issue = issue_detail;
