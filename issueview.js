@@ -7,6 +7,7 @@ class IssueView {
         this.root = root
         this.payload = payload
         this.client = client
+        this.state = {issue: false}
     }
     focus() {
         this.box.focus()
@@ -16,6 +17,32 @@ class IssueView {
         this.reRender()
     }
     reRender() {
+        var self = this
+        if(self.state.issue) {
+            marked.setOptions({
+            //  Define custom renderer
+                renderer: new TerminalRenderer()
+            })
+
+            var cnt = "{#00ff00-fg}Issue:{/} {underline}" + this.state.issue.title + "{/}\n"
+            cnt += "{#00ff00-fg}User:{/} {underline}" + this.state.issue.user.login + "{/}\n"
+            cnt += "{#00ff00-fg}State:{/} {underline}" + this.state.issue.state + "{/}\n"
+            cnt += "{#00ff00-fg}Created:{/} {underline}" + this.state.issue.created_at + "{/} Modified: {underline}" + this.state.issue.updated_at + "{/}\n"
+            cnt += "Labels: \n"
+
+            this.state.issue.labels.forEach(function(label) {
+                cnt += "{#" + label.color + "-bg}{white-fg}" + label.name + "{/},"
+            });
+
+            cnt += '\n\n'
+            cnt += marked(this.state.issue.body)
+            self.box.setContent(cnt)
+            //self.box.setContent(JSON.stringify(this.state.issue, null, 2))
+
+          
+
+        }
+        self.box.focus()
         this.box.screen.render()
     }
     createView() {
@@ -57,19 +84,7 @@ class IssueView {
         var self = this
         var issue = this.client.issue(this.payload.repo, this.payload.id)
         issue.info(function(error, issue) {
-            marked.setOptions({
-                //  Define custom renderer
-                renderer: new TerminalRenderer()
-            })
-      
-            var cnt = issue.title + '\n'
-            cnt += '\n'
-            cnt += issue.body
-            self.box.setContent(marked(cnt))
-
-            self.reRender()
-            self.box.focus()
-      
+            self.setState({issue: issue})
         })
     }
     remove() {
