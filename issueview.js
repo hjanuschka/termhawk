@@ -38,9 +38,15 @@ class IssueView {
             cnt += marked(this.state.issue.body)
 
             cnt += "Comments: \n\n"
+
             this.state.comments.forEach(function(comment) {
                 cnt += "\n";
-                cnt += marked(comment.body);
+            cnt += "──────────────────────────────────────\n"
+            cnt += "{#00ff00-fg}User:{/} {underline}" + comment.user.login + "{/}\n"
+            cnt += "{#00ff00-fg}Created:{/} {underline}" + comment.created_at + "{/} Modified: {underline}" + comment.updated_at + "{/}\n"
+            cnt += "\n"
+
+                cnt += marked(comment.body) + "\n";
                 cnt += "\n";
             });
             self.box.setContent(cnt)
@@ -75,7 +81,7 @@ class IssueView {
             'top': 0,
             'left': 0,
             'style': {
-                'bg': '#272822',
+                'bg': 'black',
                 'border': { 'fg': '#f0f0f0' },
                 'fg': 'white',
             }
@@ -108,6 +114,7 @@ class IssueView {
         var self = this
         this.box.key(['h'], function(ch, key) {
             self.remove()
+            self.state = {issue: false}
             self.reRender()
         })
     }
