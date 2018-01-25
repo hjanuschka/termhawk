@@ -62,7 +62,7 @@ class IssueView {
 
             this.state.comments.forEach(function(comment) {
                 var reviewed = false
-                if (comment.state) {
+                if (comment && comment.state) {
                     comment.created_at = comment.submitted_at
                     reviewed = comment.state
                 }
