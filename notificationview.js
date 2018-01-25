@@ -5,6 +5,7 @@ class NotificationView {
     constructor(root, client) {
         this.root = root
         this.client = client
+        this.state = {storeIndex: false}
     }
     setState(state) {
         this.state = state
@@ -38,7 +39,7 @@ class NotificationView {
         var me = self.client.me()
         //EMPTY out
         me.notifications( {}, function( err, a ) {
-            self.setState({notifications: a})
+            self.setState({notifications: a, storeIndex: false})
         } )
 
     }
