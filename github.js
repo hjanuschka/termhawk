@@ -54,8 +54,8 @@ class GithubDriver {
     loadIssueComments(repo, id) {
         var self = this
         return new Promise(function(resolve, reject) {
-            var pr = self.client.pr(repo, id)
-            pr.comments(function(error, comments) {
+            var issue = self.client.issue(repo, id)
+            issue.comments(function(error, comments) {
                 //FIXME: normalize
                 resolve(comments)
             })

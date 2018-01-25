@@ -62,8 +62,24 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            /*
-            this.state.comments.filter(function(n) {
+            var comments = [].concat(this.state.pr_comments, this.state.issue_comments, this.state.pr_reviews)
+
+            comments.sort(function(a, b) {
+                // Turn your strings into dates, and then subtract them
+                // to get a value that is either negative, positive, or zero.
+                var a_date = a.created_at
+                var b_date = b.created_at
+                if (!a.created_at) {
+                    a_date = a.submitted_at
+                }
+                if (!b.created_at) {
+                    b_date = b.submitted_at
+                }
+                return new Date(a_date) - new Date(b_date)
+            })
+
+            comments.filter(function(n) {
+                if (n.pull_request_review_id) return false
                 return n != undefined
             }).forEach(function(comment) {
                 var reviewed = false
@@ -79,6 +95,14 @@ class IssueView {
                 }
                 cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
                 cnt += '\n'
+
+                self.state.pr_comments.forEach(function(pcomment) {
+                    if (pcomment.pull_request_review_id == comment.id) {
+                        cnt += "\t\t ->" + pcomment.body + "\n"
+                    }
+                })
+
+
 
                 if (comment.diff_hunk) {
                     var diff_lines = comment.diff_hunk.split('\n')
@@ -98,11 +122,14 @@ class IssueView {
                     })
                 } else {
                     cnt += striptags(marked(comment.body)) + '\n'
+
                 }
+
+                //cnt += JSON.stringify(comment, null, 2);
                 self.root.screen.debug(JSON.stringify(comment, null, 2))
                 cnt += '\n'
             })
-            */
+
             self.box.setContent(cnt)
                 //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 

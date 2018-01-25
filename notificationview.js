@@ -123,8 +123,8 @@ class NotificationView {
             var not = self.state.notifications[index - 1]
 
             var id = not.target_id;
-            //not.repository.full_name='hjanuschka/termhawk'
-            //id=1;
+            not.repo ='hjanuschka/termhawk'
+            id=1;
             var issue = new IssueView(self.root, self.driver, {
                 repo: not.repo,
                 id: id
