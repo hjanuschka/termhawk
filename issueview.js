@@ -75,7 +75,7 @@ class IssueView {
             'top': 0,
             'left': 0,
             'style': {
-                'bg': 'blue',
+                'bg': '#272822',
                 'border': { 'fg': '#f0f0f0' },
                 'fg': 'white',
             }

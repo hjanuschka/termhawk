@@ -57,17 +57,17 @@ class NotificationView {
             'mouse': true,
             'width': '100%',
             'style': {
-                'border': { 'fg': 'cyan' },
+                'border': { 'fg': 'white' },
                 'header': {
-                    'fg': 'white',
-                    'bg': 'orange',
+                    'fg': 'black',
+                    'bg': '#FD971F',
                     'bold': true
                 },
-                'bg': 'blue',
+                'bg': '#272822',
                 'cell': {
                     'fg': 'white',
-                    'bg': 'blue',
-                    'selected': { 'bg': 'green', 'fg': 'black' }
+                    'bg': '#272822',
+                    'selected': { 'bg': '#FD971f', 'fg': 'black' }
                 }
             }
         } )
