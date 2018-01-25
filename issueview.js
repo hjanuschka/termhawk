@@ -1,7 +1,7 @@
 var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
-var striptags = require('striptags');
+var striptags = require('striptags')
 
 
 class IssueView {
@@ -25,39 +25,39 @@ class IssueView {
             //  Define custom renderer
                 renderer: new TerminalRenderer()
             })
-            var kind = "Issue"
-            if(this.state.is_pr) kind = "Pull Request"
+            var kind = 'Issue'
+            if(this.state.is_pr) kind = 'Pull Request'
 
-            var cnt = "{#00ff00-fg}" + kind + ":{/} {underline}" + this.state.issue.title + "{/} #" + this.payload.id + "\n"
-            cnt += "{#00ff00-fg}User:{/} {underline}" + this.state.issue.user.login + "{/}\n"
-            cnt += "{#00ff00-fg}State:{/} {underline}" + this.state.issue.state + "{/}\n"
-            cnt += "{#00ff00-fg}Created:{/} {underline}" + this.state.issue.created_at + "{/} Modified: {underline}" + this.state.issue.updated_at + "{/}\n"
+            var cnt = '{#00ff00-fg}' + kind + ':{/} {underline}' + this.state.issue.title + '{/} #' + this.payload.id + '\n'
+            cnt += '{#00ff00-fg}User:{/} {underline}' + this.state.issue.user.login + '{/}\n'
+            cnt += '{#00ff00-fg}State:{/} {underline}' + this.state.issue.state + '{/}\n'
+            cnt += '{#00ff00-fg}Created:{/} {underline}' + this.state.issue.created_at + '{/} Modified: {underline}' + this.state.issue.updated_at + '{/}\n'
             if(this.state.issue.labels) {
-              cnt += "Labels: \n"
-              this.state.issue.labels.forEach(function(label) {
-                  cnt += "{#" + label.color + "-bg}{white-fg}" + label.name + "{/},"
-              });
-              }
+                cnt += 'Labels: \n'
+                this.state.issue.labels.forEach(function(label) {
+                    cnt += '{#' + label.color + '-bg}{white-fg}' + label.name + '{/},'
+                })
+            }
 
             cnt += '\n\n'
             cnt += striptags(marked(this.state.issue.body))
 
-            cnt += "Comments: \n\n"
+            cnt += 'Comments: \n\n'
 
             this.state.comments.reverse().forEach(function(comment) {
-                cnt += "\n";
-            cnt += "──────────────────────────────────────\n"
-            cnt += "{#00ff00-fg}User:{/} {underline}" + comment.user.login + "{/}\n"
-            cnt += "{#00ff00-fg}Created:{/} {underline}" + comment.created_at + "{/} Modified: {underline}" + comment.updated_at + "{/}\n"
-            cnt += "\n"
+                cnt += '\n'
+                cnt += '──────────────────────────────────────\n'
+                cnt += '{#00ff00-fg}User:{/} {underline}' + comment.user.login + '{/}\n'
+                cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/} Modified: {underline}' + comment.updated_at + '{/}\n'
+                cnt += '\n'
 
-                cnt += striptags(marked(comment.body)) + "\n";
-                cnt += "\n";
-            });
+                cnt += striptags(marked(comment.body)) + '\n'
+                cnt += '\n'
+            })
             self.box.setContent(cnt)
             //self.box.setContent(JSON.stringify(this.state.issue, null, 2))
 
-          
+
 
         }
         self.box.focus()
@@ -100,17 +100,17 @@ class IssueView {
     }
     loadData() {
         var self = this
-        var type = "issue";
+        var type = 'issue'
         self.state.is_pr=false
         if(self.payload.not.subject.type == 'PullRequest') {
-          self.state.is_pr=true
+            self.state.is_pr=true
         }
         var issue = this.client[type](this.payload.repo, this.payload.id)
         issue.info(function(error, issue_detail) {
-            var newState = self.state;
-            newState.issue = issue_detail;
+            var newState = self.state
+            newState.issue = issue_detail
             issue.comments(function(err, comments) {
-                newState.comments = comments;
+                newState.comments = comments
                 self.setState(newState)
             })
 
@@ -120,12 +120,73 @@ class IssueView {
         this.root.remove(this.box)
         this.reRender()
     }
+    renderCommitBox() {
+        var self = this
+        var data = [['sha', 'commiter', 'message']]
+        var pr = this.client.pr(this.payload.repo, this.payload.id)
+
+        pr.commits(function(error, commits) {
+            commits.forEach(function(commit) {
+                data.push([
+                    commit.commit.tree.sha.substring(0,5),
+                    commit.commit.committer.name,
+                    commit.commit.message
+                ])
+            })
+            var commitList = blessed.listtable({
+                'parent': self.root,
+                'data': data,
+                'border': 'line',
+                'tags': true,
+                'keys': true,
+                'vi': true,
+                'align': 'left',
+                'wrap': true,
+                'left': 'center',
+                'top': 'center',
+                'height': '50%',
+                'mouse': true,
+                'width': '50%',
+                'style': {
+                    'border': { 'fg': 'white' },
+                    'header': {
+                        'fg': 'black',
+                        'bg': '#FD971F',
+                        'bold': true
+                    },
+                    'bg': '#272822',
+                    'cell': {
+                        'fg': 'white',
+                        'bg': '#272822',
+                        'selected': { 'bg': '#FD971f', 'fg': 'black' }
+                    }
+                }
+
+
+            })
+            commitList.key(['h'], function() {
+              self.root.remove(commitList);
+              self.box.screen.render()
+            })
+            commitList.focus()
+            self.box.screen.render()
+
+        })
+    }
+
     events() {
         var self = this
+        this.box.key(['z'], function(ch, key) {
+
+            if(self.state.is_pr) {
+                self.renderCommitBox()
+            }
+
+        })
         this.box.key(['h'], function(ch, key) {
             self.remove()
             self.state = {issue: false}
-            self.reRender()
+            self.box.screen.render()
         })
     }
 }
