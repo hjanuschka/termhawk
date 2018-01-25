@@ -60,7 +60,7 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            this.state.comments.forEach(function(comment) {
+            this.state.comments.filter(function(n){ return n != undefined }).forEach(function(comment) {
                 var reviewed = false
                 if (comment && comment.state) {
                     comment.created_at = comment.submitted_at
@@ -94,7 +94,7 @@ class IssueView {
                 } else {
                     cnt += striptags(marked(comment.body)) + '\n'
                 }
-                //cnt += JSON.stringify(comment, null, 2);
+                self.root.screen.debug( JSON.stringify(comment, null, 2) );
                 cnt += '\n'
             })
             self.box.setContent(cnt)

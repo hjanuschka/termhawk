@@ -6,6 +6,7 @@ var BottomBar = require('./bottombar.js')
 // Create a screen object.
 var screen = blessed.screen( { 'smartCSR': true, autoPadding: false,
     fullUnicode: true,
+debug: true,
     warnings: true} )
 
 
