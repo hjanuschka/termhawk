@@ -33,7 +33,7 @@ class IssueView {
 
             var kind = 'Issue'
             var pr_info = ''
-            if (this.state.is_pr) {
+            if (this.state.issue.is_pr) {
                 var mergeable = 'false'
                 if (this.state.pr.mergeable) mergeable = 'true'
                 kind = 'Pull Request'
@@ -104,7 +104,7 @@ class IssueView {
             })
             */
             self.box.setContent(cnt)
-            //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
+                //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 
 
 
@@ -196,7 +196,10 @@ class IssueView {
         var data = [
             ['sha', 'commiter', 'message']
         ]
-        this.driver.getDiff(this.payload.repo, this.payload.id)
+        fetch(this.state.issue.diff_url)
+            .then(function(res) {
+                return res.text()
+            })
             .then(function(diff_in) {
                 var diff = ''
                 diff_in.split('\n').forEach(function(l) {
@@ -271,7 +274,7 @@ class IssueView {
                 commits.forEach(function(commit) {
                     data.push([
                         commit.sha.substring(0, 5),
-                        commit.commiter.name,
+                        commit.committer.name,
                         commit.message
                     ])
                 })
@@ -327,19 +330,19 @@ class IssueView {
         var self = this
         this.box.key(['z'], function(ch, key) {
 
-            if (self.state.is_pr) {
+            if (self.state.issue.is_pr) {
                 self.renderCommitBox()
             }
 
         })
 
         this.box.key(['d'], function() {
-            if (self.state.is_pr) {
+            if (self.state.issue.is_pr) {
                 self.renderDiffBox()
             }
         })
         this.box.key(['r'], function() {
-            if (self.state.is_pr) {
+            if (self.state.issue.is_pr) {
                 self.renderReviewList()
             }
         })

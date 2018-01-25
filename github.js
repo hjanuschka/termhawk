@@ -13,6 +13,26 @@ class GithubDriver {
 
         })
     }
+    getCommitsForPR(repo, id) {
+        var pr = this.client.pr(repo, id)
+            //var self = this
+        return new Promise(function(resolve, reject) {
+            pr.commits(function(error, commits) {
+                //FIXME normalize
+                var transformed = []
+                commits.forEach(function(commit) {
+                    transformed.push({
+                        sha: commit.commit.tree.sha,
+                        committer: {
+                            name: commit.commit.committer.name
+                        },
+                        message: commit.commit.message
+                    })
+                })
+                resolve(transformed)
+            })
+        })
+    }
     loadIssue(repo, id) {
         //Loads an Issue, and returns
         //issue
@@ -23,6 +43,10 @@ class GithubDriver {
             var issue = self.client.issue(repo, id)
             issue.info(function(error, issue_detail) {
                 //FIXME: normalize
+                if (issue_detail.pull_request) {
+                    issue_detail.is_pr = true
+                    issue_detail.diff_url = issue_detail.pull_request.diff_url
+                }
                 resolve(issue_detail)
             })
         })
