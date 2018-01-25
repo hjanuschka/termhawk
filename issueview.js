@@ -2,6 +2,7 @@ var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var striptags = require('striptags')
+var fetch = require('node-fetch')
 
 
 class IssueView {
@@ -55,7 +56,7 @@ class IssueView {
                 cnt += '\n'
             })
             self.box.setContent(cnt)
-            //self.box.setContent(JSON.stringify(this.state.issue, null, 2))
+            self.box.setContent(JSON.stringify(this.state.pr, null, 2))
 
 
 
@@ -104,22 +105,91 @@ class IssueView {
         self.state.is_pr=false
         if(self.payload.not.subject.type == 'PullRequest') {
             self.state.is_pr=true
-        }
-        var issue = this.client[type](this.payload.repo, this.payload.id)
-        issue.info(function(error, issue_detail) {
-            var newState = self.state
-            newState.issue = issue_detail
-            issue.comments(function(err, comments) {
-                newState.comments = comments
-                self.setState(newState)
-            })
+            var pr = self.client.issue(self.payload.repo, self.payload.id)
+            pr.info(function(e, pr_detail) {
+                var issue = self.client.issue(self.payload.repo, self.payload.id)
+                issue.info(function(error, issue_detail) {
+                    var newState = self.state
+                    newState.issue = issue_detail
+                    newState.pr = pr_detail
+                    issue.comments(function(err, comments) {
+                        newState.comments = comments
+                        self.setState(newState)
+                    })
 
-        })
+                })
+
+            })
+        } else {
+            var issue = this.client.issue(this.payload.repo, this.payload.id)
+            issue.info(function(error, issue_detail) {
+                var newState = self.state
+                newState.issue = issue_detail
+                issue.comments(function(err, comments) {
+                    newState.comments = comments
+                    self.setState(newState)
+                })
+
+            })
+        }
     }
     remove() {
         this.root.remove(this.box)
         this.reRender()
     }
+    renderDiffBox() {
+        var self = this
+        var data = [['sha', 'commiter', 'message']]
+        var pr = this.client.pr(this.payload.repo, this.payload.id)
+
+        fetch(this.state.pr.pull_request.diff_url)
+            .then(function(res) { return res.text() })
+            .then(function(diff) {
+                var diffBox = blessed.box({
+                    'parent': self.root,
+                    'border': 'line',
+                    'scrollable': true,
+                    alwaysScroll: true,
+
+                    scrollbar: {
+                        style: {
+                            bg: 'red'
+                        }
+                    },
+
+                    'tags': true,
+                    'keys': true,
+                    'label': 'Diff',
+                    'vi': true,
+                    'align': 'left',
+                    'wrap': true,
+                    'left': 'center',
+                    'content': diff,
+                    'top': 'center',
+                    'height': '80%',
+                    'mouse': true,
+                    'width': '80%',
+                    'style': {
+                        'border': { 'fg': 'white' },
+                        'header': {
+                            'fg': 'black',
+                            'bg': '#FD971F',
+                            'bold': true
+                        },
+                        'bg': 'blue',
+                    }
+                })
+                diffBox.key(['h'], function() {
+                    self.root.remove(diffBox)
+                    self.box.screen.render()
+                })
+                diffBox.focus()
+                self.box.screen.render()
+
+
+            })
+    }
+
     renderCommitBox() {
         var self = this
         var data = [['sha', 'commiter', 'message']]
@@ -165,9 +235,11 @@ class IssueView {
 
             })
             commitList.key(['h'], function() {
-              self.root.remove(commitList);
-              self.box.screen.render()
+                self.root.remove(commitList)
+                self.box.screen.render()
             })
+
+
             commitList.focus()
             self.box.screen.render()
 
@@ -182,6 +254,13 @@ class IssueView {
                 self.renderCommitBox()
             }
 
+        })
+
+        this.box.key(['d'], function() {
+
+            if(self.state.is_pr) {
+                self.renderDiffBox()
+            }
         })
         this.box.key(['h'], function(ch, key) {
             self.remove()
