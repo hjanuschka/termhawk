@@ -56,7 +56,7 @@ class IssueView {
                 cnt += '\n'
             })
             self.box.setContent(cnt)
-            self.box.setContent(JSON.stringify(this.state.pr, null, 2))
+            //self.box.setContent(JSON.stringify(this.state.issue, null, 2))
 
 
 
@@ -103,35 +103,32 @@ class IssueView {
         var self = this
         var type = 'issue'
         self.state.is_pr=false
-        if(self.payload.not.subject.type == 'PullRequest') {
-            self.state.is_pr=true
-            var pr = self.client.issue(self.payload.repo, self.payload.id)
-            pr.info(function(e, pr_detail) {
-                var issue = self.client.issue(self.payload.repo, self.payload.id)
-                issue.info(function(error, issue_detail) {
-                    var newState = self.state
-                    newState.issue = issue_detail
-                    newState.pr = pr_detail
-                    issue.comments(function(err, comments) {
-                        newState.comments = comments
-                        self.setState(newState)
+        var issue = this.client.issue(this.payload.repo, this.payload.id)
+        issue.info(function(error, issue_detail) {
+            var newState = self.state
+            newState.is_pr =false
+            newState.issue = issue_detail
+            issue.comments(function(err, comments) {
+                newState.comments = comments
+                if(issue_detail.pull_request) {
+                    var pr = self.client.issue(self.payload.repo, self.payload.id)
+                    pr.info(function(e, pr_detail) {
+                        newState.pr = pr_detail
+                        newState.is_pr = true
+                        pr.comments(function(e, pr_comments) {
+                          newState.pr_comments = pr_comments;
+                          self.setState(newState)
+                        });
                     })
 
-                })
-
-            })
-        } else {
-            var issue = this.client.issue(this.payload.repo, this.payload.id)
-            issue.info(function(error, issue_detail) {
-                var newState = self.state
-                newState.issue = issue_detail
-                issue.comments(function(err, comments) {
-                    newState.comments = comments
+                } else {
                     self.setState(newState)
-                })
+                }
+
 
             })
-        }
+
+        })
     }
     remove() {
         this.root.remove(this.box)
