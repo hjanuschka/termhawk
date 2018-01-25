@@ -3,14 +3,17 @@ var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var striptags = require('striptags')
 var fetch = require('node-fetch')
+var issuecomments = require('./issuecomments')
 
 
 class IssueView {
-    constructor(root,client, payload) {
+    constructor(root, client, payload) {
         this.root = root
         this.payload = payload
         this.client = client
-        this.state = {issue: false}
+        this.state = {
+            issue: false
+        }
     }
     focus() {
         this.box.focus()
@@ -21,21 +24,21 @@ class IssueView {
     }
     reRender() {
         var self = this
-        if(self.state.issue) {
+        if (self.state.issue) {
             marked.setOptions({
-            //  Define custom renderer
+                //  Define custom renderer
                 renderer: new TerminalRenderer()
             })
             var kind = 'Issue'
-            var pr_info = "";
-            if(this.state.is_pr) {
-              var mergeable = "false"
-              if(this.state.pr.mergeable) mergeable = "true"
-              kind = 'Pull Request'
-              pr_info +=  "{underline}Mergable{/}:" + mergeable + "\n";
-              pr_info += "{underline}Diff Stat{/}: Removes: {red-fg}" + this.state.pr.deletions + "{/} "
+            var pr_info = ''
+            if (this.state.is_pr) {
+                var mergeable = 'false'
+                if (this.state.pr.mergeable) mergeable = 'true'
+                kind = 'Pull Request'
+                pr_info += '{underline}Mergable{/}:' + mergeable + '\n'
+                pr_info += '{underline}Diff Stat{/}: Removes: {red-fg}' + this.state.pr.deletions + '{/} '
 
-              pr_info +=  "Adds: {green-fg}" + this.state.pr.additions + "{/} \n\n"
+                pr_info += 'Adds: {green-fg}' + this.state.pr.additions + '{/} \n\n'
 
 
             }
@@ -44,8 +47,8 @@ class IssueView {
             cnt += '{#00ff00-fg}User:{/} {underline}' + this.state.issue.user.login + '{/}\n'
             cnt += '{#00ff00-fg}State:{/} {underline}' + this.state.issue.state + '{/}\n'
             cnt += '{#00ff00-fg}Created:{/} {underline}' + this.state.issue.created_at + '{/} Modified: {underline}' + this.state.issue.updated_at + '{/}\n'
-            cnt += pr_info + "\n"
-            if(this.state.issue.labels) {
+            cnt += pr_info + '\n'
+            if (this.state.issue.labels) {
                 cnt += 'Labels: \n'
                 this.state.issue.labels.forEach(function(label) {
                     cnt += '{#' + label.color + '-bg}{white-fg}' + label.name + '{/},'
@@ -57,18 +60,45 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            this.state.comments.reverse().forEach(function(comment) {
+            this.state.comments.forEach(function(comment) {
+                var reviewed = false
+                if (comment.state) {
+                    comment.created_at = comment.submitted_at
+                    reviewed = comment.state
+                }
                 cnt += '\n'
                 cnt += '──────────────────────────────────────\n'
                 cnt += '{#00ff00-fg}User:{/} {underline}' + comment.user.login + '{/}\n'
-                cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/} Modified: {underline}' + comment.updated_at + '{/}\n'
+                if (reviewed) {
+                    cnt += "{white-bg}{black-fg}Review Added{/}: " + reviewed + "\n";
+                }
+                cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
                 cnt += '\n'
 
-                cnt += striptags(marked(comment.body)) + '\n'
+                if (comment.diff_hunk) {
+                    var diff_lines = comment.diff_hunk.split("\n");
+                    diff_lines.forEach(function(l, idx) {
+                        var color = "{white-fg}"
+                        if (l.match(/^\-/)) {
+                            color = "{red-fg}"
+                        }
+                        if (l.match(/^\+/)) {
+                            color = "{green-fg}"
+                        }
+                        cnt += color + l + "{/}\n"
+                        if (idx == comment.original_position) {
+                            cnt += striptags(marked(comment.body)) + '\n'
+                        }
+
+                    })
+                } else {
+                    cnt += striptags(marked(comment.body)) + '\n'
+                }
+                //cnt += JSON.stringify(comment, null, 2);
                 cnt += '\n'
             })
             self.box.setContent(cnt)
-            //self.box.setContent(JSON.stringify(this.state.pr, null, 2))
+                //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 
 
 
@@ -77,8 +107,10 @@ class IssueView {
         this.box.screen.render()
     }
     createView() {
-        this.box = blessed.box( {
-            'border': { 'type': 'line' },
+        this.box = blessed.box({
+            'border': {
+                'type': 'line'
+            },
             'parent': this.root,
             'scrollable': true,
             alwaysScroll: true,
@@ -100,10 +132,12 @@ class IssueView {
             'left': 0,
             'style': {
                 'bg': 'black',
-                'border': { 'fg': '#f0f0f0' },
+                'border': {
+                    'fg': '#f0f0f0'
+                },
                 'fg': 'white',
             }
-        } )
+        })
         this.box.enableInput()
         this.events()
         this.reRender()
@@ -114,30 +148,19 @@ class IssueView {
     loadData() {
         var self = this
         var type = 'issue'
-        self.state.is_pr=false
-        var issue = this.client.issue(this.payload.repo, this.payload.id)
-        issue.info(function(error, issue_detail) {
-            var newState = self.state
-            newState.is_pr =false
-            newState.issue = issue_detail
-            issue.comments(function(err, comments) {
-                newState.comments = comments
-                if(issue_detail.pull_request) {
-                    var pr = self.client.pr(self.payload.repo, self.payload.id)
-                    pr.info(function(e, pr_detail) {
-                        newState.pr = pr_detail
-                        newState.is_pr = true
-                          self.setState(newState)
-                    })
-
-                } else {
-                    self.setState(newState)
-                }
-
-
+        var issueLoader = new issuecomments(this.client, this.payload.repo, this.payload.id)
+        issueLoader.load()
+            .then(function(issueInfo) {
+                var newState = self.state
+                newState.issue = issueInfo.detail
+                newState.is_pr = issueInfo.is_pr
+                newState.pr = issueInfo.pr
+                newState.comments = issueInfo.timeline
+                self.setState(newState)
             })
 
-        })
+
+        return
     }
     remove() {
         this.root.remove(this.box)
@@ -145,12 +168,28 @@ class IssueView {
     }
     renderDiffBox() {
         var self = this
-        var data = [['sha', 'commiter', 'message']]
+        var data = [
+            ['sha', 'commiter', 'message']
+        ]
         var pr = this.client.pr(this.payload.repo, this.payload.id)
 
         fetch(this.state.pr.diff_url)
-            .then(function(res) { return res.text() })
-            .then(function(diff) {
+            .then(function(res) {
+                return res.text()
+            })
+            .then(function(diff_in) {
+                var diff = ""
+                diff_in.split("\n").forEach(function(l) {
+                    var color = "{white-fg}"
+                    if (l.match(/^\-/)) {
+                        color = "{red-fg}"
+                    }
+                    if (l.match(/^\+/)) {
+                        color = "{green-fg}"
+                    }
+                    diff += color + l + "{/}\n"
+
+                });
                 var diffBox = blessed.box({
                     'parent': self.root,
                     'border': 'line',
@@ -176,13 +215,15 @@ class IssueView {
                     'mouse': true,
                     'width': '80%',
                     'style': {
-                        'border': { 'fg': 'white' },
+                        'border': {
+                            'fg': 'white'
+                        },
                         'header': {
                             'fg': 'black',
                             'bg': '#FD971F',
                             'bold': true
                         },
-                        'bg': 'blue',
+                        'bg': 'black',
                     }
                 })
                 diffBox.key(['h'], function() {
@@ -198,13 +239,15 @@ class IssueView {
 
     renderCommitBox() {
         var self = this
-        var data = [['sha', 'commiter', 'message']]
+        var data = [
+            ['sha', 'commiter', 'message']
+        ]
         var pr = this.client.pr(this.payload.repo, this.payload.id)
 
         pr.commits(function(error, commits) {
             commits.forEach(function(commit) {
                 data.push([
-                    commit.commit.tree.sha.substring(0,5),
+                    commit.commit.tree.sha.substring(0, 5),
                     commit.commit.committer.name,
                     commit.commit.message
                 ])
@@ -224,7 +267,9 @@ class IssueView {
                 'mouse': true,
                 'width': '50%',
                 'style': {
-                    'border': { 'fg': 'white' },
+                    'border': {
+                        'fg': 'white'
+                    },
                     'header': {
                         'fg': 'black',
                         'bg': '#FD971F',
@@ -234,7 +279,10 @@ class IssueView {
                     'cell': {
                         'fg': 'white',
                         'bg': '#272822',
-                        'selected': { 'bg': '#FD971f', 'fg': 'black' }
+                        'selected': {
+                            'bg': '#FD971f',
+                            'fg': 'black'
+                        }
                     }
                 }
 
@@ -256,25 +304,27 @@ class IssueView {
         var self = this
         this.box.key(['z'], function(ch, key) {
 
-            if(self.state.is_pr) {
+            if (self.state.is_pr) {
                 self.renderCommitBox()
             }
 
         })
 
         this.box.key(['d'], function() {
-            if(self.state.is_pr) {
+            if (self.state.is_pr) {
                 self.renderDiffBox()
             }
         })
         this.box.key(['r'], function() {
-            if(self.state.is_pr) {
+            if (self.state.is_pr) {
                 self.renderReviewList()
             }
         })
         this.box.key(['h'], function(ch, key) {
             self.remove()
-            self.state = {issue: false}
+            self.state = {
+                issue: false
+            }
             self.box.screen.render()
         })
     }
