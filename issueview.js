@@ -27,12 +27,24 @@ class IssueView {
                 renderer: new TerminalRenderer()
             })
             var kind = 'Issue'
-            if(this.state.is_pr) kind = 'Pull Request'
+            var pr_info = "";
+            if(this.state.is_pr) {
+              var mergeable = "false"
+              if(this.state.pr.mergeable) mergeable = "true"
+              kind = 'Pull Request'
+              pr_info +=  "{underline}Mergable{/}:" + mergeable + "\n";
+              pr_info += "{underline}Diff Stat{/}: Removes: {red-fg}" + this.state.pr.deletions + "{/} "
+
+              pr_info +=  "Adds: {green-fg}" + this.state.pr.additions + "{/} \n\n"
+
+
+            }
 
             var cnt = '{#00ff00-fg}' + kind + ':{/} {underline}' + this.state.issue.title + '{/} #' + this.payload.id + '\n'
             cnt += '{#00ff00-fg}User:{/} {underline}' + this.state.issue.user.login + '{/}\n'
             cnt += '{#00ff00-fg}State:{/} {underline}' + this.state.issue.state + '{/}\n'
             cnt += '{#00ff00-fg}Created:{/} {underline}' + this.state.issue.created_at + '{/} Modified: {underline}' + this.state.issue.updated_at + '{/}\n'
+            cnt += pr_info + "\n"
             if(this.state.issue.labels) {
                 cnt += 'Labels: \n'
                 this.state.issue.labels.forEach(function(label) {
@@ -56,7 +68,7 @@ class IssueView {
                 cnt += '\n'
             })
             self.box.setContent(cnt)
-            //self.box.setContent(JSON.stringify(this.state.issue, null, 2))
+            //self.box.setContent(JSON.stringify(this.state.pr, null, 2))
 
 
 
@@ -111,14 +123,11 @@ class IssueView {
             issue.comments(function(err, comments) {
                 newState.comments = comments
                 if(issue_detail.pull_request) {
-                    var pr = self.client.issue(self.payload.repo, self.payload.id)
+                    var pr = self.client.pr(self.payload.repo, self.payload.id)
                     pr.info(function(e, pr_detail) {
                         newState.pr = pr_detail
                         newState.is_pr = true
-                        pr.comments(function(e, pr_comments) {
-                          newState.pr_comments = pr_comments;
                           self.setState(newState)
-                        });
                     })
 
                 } else {
@@ -139,7 +148,7 @@ class IssueView {
         var data = [['sha', 'commiter', 'message']]
         var pr = this.client.pr(this.payload.repo, this.payload.id)
 
-        fetch(this.state.pr.pull_request.diff_url)
+        fetch(this.state.pr.diff_url)
             .then(function(res) { return res.text() })
             .then(function(diff) {
                 var diffBox = blessed.box({
@@ -254,9 +263,13 @@ class IssueView {
         })
 
         this.box.key(['d'], function() {
-
             if(self.state.is_pr) {
                 self.renderDiffBox()
+            }
+        })
+        this.box.key(['r'], function() {
+            if(self.state.is_pr) {
+                self.renderReviewList()
             }
         })
         this.box.key(['h'], function(ch, key) {

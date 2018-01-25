@@ -110,6 +110,8 @@ class NotificationView {
 
             var matches = not.subject.url.match(/.*\/([0-9]+$)/)
             var id = matches[1]
+            //not.repository.full_name='fastlane/fastlane'
+            //id=11625;
             var issue = new IssueView(self.root,self.client, {repo:not.repository.full_name, id: id, not: not})
             issue.createView()
             issue.focus()
