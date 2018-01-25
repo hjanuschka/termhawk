@@ -29,7 +29,7 @@ class BottomBar {
                 item: {
                     bg: 'magenta',
                     fg: 'white'
-                    //focus: {
+                    //focus: {asd asda
                     //  bg: 'blue'
                     //}
                 },
