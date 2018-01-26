@@ -80,13 +80,19 @@ class IssueView {
 
             comments = comments.filter(function(n) {
                 if (n && n.in_reply_to_id) return false
+                //if (n && n.body == '') return false
                 return n != undefined
             })
+            var seen_reviews = {}
             comments.forEach(function(comment) {
+                if (seen_reviews[comment.id] === true) {
+                    return
+                }
                 var reviewed = false
-                if (comment && comment.pull_request_review_id) {
+                if (comment && comment.pull_request_review_id || comment.state) {
                     //comment.created_at = comment.submitted_at
-                    reviewed = 'AAAA'
+                    reviewed = comment.state
+                    if(!comment.created_at) comment.created_at = comment.submitted_at
                     self.state.pr_reviews.forEach(function(r) {
                         if (r.id == comment.pull_request_review_id) {
                             reviewed = r.state
@@ -104,14 +110,16 @@ class IssueView {
 
 
 
-debugger;
                 self.state.pr_reviews.forEach(function(p) {
                     if (p.id == comment.pull_request_review_id) {
                         cnt += striptags(marked(p.body)) + '\n'
+                        seen_reviews[p.id] = true
                     }
                 })
 
+
                 if (comment.diff_hunk) {
+                    cnt += '{yellow-fg}' + comment.path + '{/}\n'
                     var diff_lines = comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
                         var color = '{white-fg}'
