@@ -104,6 +104,12 @@ class IssueView {
 
 
 
+debugger;
+                self.state.pr_reviews.forEach(function(p) {
+                    if (p.id == comment.pull_request_review_id) {
+                        cnt += striptags(marked(p.body)) + '\n'
+                    }
+                })
 
                 if (comment.diff_hunk) {
                     var diff_lines = comment.diff_hunk.split('\n')
@@ -116,14 +122,12 @@ class IssueView {
                             color = '{green-fg}'
                         }
                         cnt += color + l + '{/}\n'
-                        if (idx == comment.original_position) {
-                            cnt += '\n' + striptags(marked(comment.body)) + '\n'
-                        }
+                        if (idx == comment.original_position) {}
 
                     })
                     //Find answers
                     self.state.pr_comments.forEach(function(pcomment) {
-                        if (pcomment.in_reply_to_id == comment.id) {
+                        if (pcomment.in_reply_to_id == comment.id || pcomment.id == comment.id) {
 
                             cnt += '\t\t──────────────────────────────────────\n'
                             cnt += '\t\t{#00ff00-fg}User:{/} {underline}' + pcomment.user.login + '{/}\n'
@@ -135,6 +139,18 @@ class IssueView {
                     })
                 } else {
                     cnt += striptags(marked(comment.body)) + '\n'
+                    self.state.pr_comments.forEach(function(pcomment) {
+                        if (pcomment.in_reply_to_id == comment.id) {
+
+                            cnt += '\t\t──────────────────────────────────────\n'
+                            cnt += '\t\t{#00ff00-fg}User:{/} {underline}' + pcomment.user.login + '{/}\n'
+                            cnt += '\t\t{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
+                            striptags(marked(pcomment.body)).split('\n').forEach(function(l) {
+                                cnt += '\t\t' + l + '\n'
+                            })
+                        }
+                    })
+
 
                 }
 
