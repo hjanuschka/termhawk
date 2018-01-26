@@ -80,7 +80,7 @@ class IssueView {
 
             comments = comments.filter(function(n) {
                 if (n && n.in_reply_to_id) return false
-                //if (n && n.body == '') return false
+                    //if (n && n.body == '') return false
                 return n != undefined
             })
             var seen_reviews = {}
@@ -123,18 +123,18 @@ class IssueView {
                     cnt += '{yellow-fg}' + comment.path + '{/}\n'
                     var diff_lines = comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
-                        var color = '{white-fg}'
-                        if (l.match(/^\-/)) {
-                            color = '{red-fg}'
-                        }
-                        if (l.match(/^\+/)) {
-                            color = '{green-fg}'
-                        }
-                        cnt += color + l + '{/}\n'
-                        if (idx == comment.original_position) {}
+                            var color = '{white-fg}'
+                            if (l.match(/^\-/)) {
+                                color = '{red-fg}'
+                            }
+                            if (l.match(/^\+/)) {
+                                color = '{green-fg}'
+                            }
+                            cnt += color + l + '{/}\n'
+                            if (idx == comment.original_position) {}
 
-                    })
-                    //Find answers
+                        })
+                        //Find answers
                     self.state.pr_comments.forEach(function(pcomment) {
                         if (pcomment.in_reply_to_id == comment.id || pcomment.id == comment.id) {
 
@@ -175,7 +175,7 @@ class IssueView {
             })
 
             self.box.setContent(cnt)
-            //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
+                //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 
 
 
@@ -224,38 +224,10 @@ class IssueView {
     }
     loadData() {
         var self = this
-        var newState = {}
-        self.driver.loadIssue(self.payload.repo, self.payload.id)
-            .then(function(issue) {
-                newState.issue = issue
-                return Promise.resolve()
-
+        self.driver.loadIssueData(self.payload.repo, self.payload.id)
+            .then(function(issueData) {
+                self.setState(issueData)
             })
-            .then(() => self.driver.loadPR(self.payload.repo, self.payload.id))
-            .then(function(pr) {
-                newState.pr = pr
-                return Promise.resolve()
-            })
-            .then(() => self.driver.loadPRReviews(self.payload.repo, self.payload.id))
-            .then(function(pr_reviews) {
-                newState.pr_reviews = pr_reviews
-                return Promise.resolve()
-            })
-            .then(() => self.driver.loadPRComments(self.payload.repo, self.payload.id))
-            .then(function(pr_comments) {
-                newState.pr_comments = pr_comments
-                return Promise.resolve()
-            })
-            .then(() => self.driver.loadIssueComments(self.payload.repo, self.payload.id))
-            .then(function(issue_comments) {
-                newState.issue_comments = issue_comments
-                return Promise.resolve()
-            })
-            .then(function() {
-                self.setState(newState)
-            })
-
-
         return
     }
     remove() {

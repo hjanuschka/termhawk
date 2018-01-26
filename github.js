@@ -33,6 +33,42 @@ class GithubDriver {
             })
         })
     }
+    loadIssueData(repo, id) {
+        var self = this;
+        var newState = {}
+      console.log(repo, id)
+        return self.loadIssue(repo, id)
+            .then(function(issue) {
+                newState.issue = issue
+                return Promise.resolve()
+
+            })
+            .then(() => self.loadPR(repo, id))
+            .then(function(pr) {
+                newState.pr = pr
+                return Promise.resolve()
+            })
+            .then(() => self.loadPRReviews(repo, id))
+            .then(function(pr_reviews) {
+                newState.pr_reviews = pr_reviews
+                return Promise.resolve()
+            })
+            .then(() => self.loadPRComments(repo, id))
+            .then(function(pr_comments) {
+                newState.pr_comments = pr_comments
+                return Promise.resolve()
+            })
+            .then(() => self.loadIssueComments(repo, id))
+            .then(function(issue_comments) {
+                newState.issue_comments = issue_comments
+                return Promise.resolve()
+            })
+            .then(function() {
+                return Promise.resolve(newState)
+            })
+
+
+    }
     loadIssue(repo, id) {
         //Loads an Issue, and returns
         //issue
