@@ -12,6 +12,7 @@ class NotificationView {
     setState(state) {
         this.state = state
         this.reRender()
+
     }
     reRender() {
         var data = [
@@ -34,6 +35,7 @@ class NotificationView {
 
         }
 
+        this.table.focus();
         this.table.render()
         this.root.screen.render()
 
