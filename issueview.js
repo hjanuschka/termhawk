@@ -88,11 +88,12 @@ class IssueView {
                 if (seen_reviews[comment.id] === true) {
                     return
                 }
+                seen_reviews[comment.id] = true
                 var reviewed = false
                 if (comment && comment.pull_request_review_id || comment.state) {
                     //comment.created_at = comment.submitted_at
                     reviewed = comment.state
-                    if(!comment.created_at) comment.created_at = comment.submitted_at
+                    if (!comment.created_at) comment.created_at = comment.submitted_at
                     self.state.pr_reviews.forEach(function(r) {
                         if (r.id == comment.pull_request_review_id) {
                             reviewed = r.state
@@ -143,6 +144,8 @@ class IssueView {
                             striptags(marked(pcomment.body)).split('\n').forEach(function(l) {
                                 cnt += '\t\t' + l + '\n'
                             })
+
+                            seen_reviews[pcomment.id] = true
                         }
                     })
                 } else {
@@ -153,6 +156,8 @@ class IssueView {
                             cnt += '\t\t──────────────────────────────────────\n'
                             cnt += '\t\t{#00ff00-fg}User:{/} {underline}' + pcomment.user.login + '{/}\n'
                             cnt += '\t\t{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
+
+                            seen_reviews[pcomment.id] = true
                             striptags(marked(pcomment.body)).split('\n').forEach(function(l) {
                                 cnt += '\t\t' + l + '\n'
                             })
