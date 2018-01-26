@@ -36,7 +36,6 @@ class GithubDriver {
     loadIssueData(repo, id) {
         var self = this;
         var newState = {}
-      console.log(repo, id)
         return self.loadIssue(repo, id)
             .then(function(issue) {
                 newState.issue = issue
