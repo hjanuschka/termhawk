@@ -62,7 +62,7 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            var comments = [].concat(this.state.pr_comments, this.state.issue_comments, this.state.pr_reviews)
+            var comments = [].concat(this.state.issue_comments, this.state.pr_comments)
 
             comments.sort(function(a, b) {
                 // Turn your strings into dates, and then subtract them
@@ -78,14 +78,20 @@ class IssueView {
                 return new Date(a_date) - new Date(b_date)
             })
 
-            comments.filter(function(n) {
-                if (n.pull_request_review_id) return false
+            comments = comments.filter(function(n) {
+                if (n && n.in_reply_to_id) return false
                 return n != undefined
-            }).forEach(function(comment) {
+            })
+            comments.forEach(function(comment) {
                 var reviewed = false
-                if (comment && comment.state) {
-                    comment.created_at = comment.submitted_at
-                    reviewed = comment.state
+                if (comment && comment.pull_request_review_id) {
+                    //comment.created_at = comment.submitted_at
+                    reviewed = 'AAAA'
+                    self.state.pr_reviews.forEach(function(r) {
+                        if (r.id == comment.pull_request_review_id) {
+                            reviewed = r.state
+                        }
+                    })
                 }
                 cnt += '\n'
                 cnt += '──────────────────────────────────────\n'
@@ -96,11 +102,6 @@ class IssueView {
                 cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
                 cnt += '\n'
 
-                self.state.pr_comments.forEach(function(pcomment) {
-                    if (pcomment.pull_request_review_id == comment.id) {
-                        cnt += "\t\t ->" + pcomment.body + "\n"
-                    }
-                })
 
 
 
@@ -116,14 +117,28 @@ class IssueView {
                         }
                         cnt += color + l + '{/}\n'
                         if (idx == comment.original_position) {
-                            cnt += striptags(marked(comment.body)) + '\n'
+                            cnt += '\n' + striptags(marked(comment.body)) + '\n'
                         }
 
+                    })
+                    //Find answers
+                    self.state.pr_comments.forEach(function(pcomment) {
+                        if (pcomment.in_reply_to_id == comment.id) {
+
+                            cnt += '\t\t──────────────────────────────────────\n'
+                            cnt += '\t\t{#00ff00-fg}User:{/} {underline}' + pcomment.user.login + '{/}\n'
+                            cnt += '\t\t{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
+                            striptags(marked(pcomment.body)).split('\n').forEach(function(l) {
+                                cnt += '\t\t' + l + '\n'
+                            })
+                        }
                     })
                 } else {
                     cnt += striptags(marked(comment.body)) + '\n'
 
                 }
+
+
 
                 //cnt += JSON.stringify(comment, null, 2);
                 self.root.screen.debug(JSON.stringify(comment, null, 2))
@@ -131,7 +146,7 @@ class IssueView {
             })
 
             self.box.setContent(cnt)
-                //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
+            //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 
 
 
@@ -158,7 +173,7 @@ class IssueView {
             'vi': true,
             'input': true,
             'keys': true,
-            'content': 'Loading.... id:' + this.id,
+            'content': 'Loading....',
             'height': '100%-3',
             'width': '100%',
             'top': 0,

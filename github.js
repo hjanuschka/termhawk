@@ -63,7 +63,15 @@ class GithubDriver {
 
 
     }
+    loadIssueEvents(repo, id) {
+        var self = this
+        return new Promise(function(resolve, reject) {
+            var pr = self.client.get("/repos/" + repo + "/" + id + "/issues/" + id + "/comments", {}, function(err, events) {
+                resolve(events)
+            })
+        })
 
+    }
     loadPRComments(repo, id) {
         var self = this
         return new Promise(function(resolve, reject) {
