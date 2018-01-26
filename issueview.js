@@ -62,7 +62,7 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            var comments = [].concat(this.state.issue_comments, this.state.pr_comments)
+            var comments = [].concat(this.state.issue_comments, this.state.pr_comments, this.state.pr_reviews)
 
             comments.sort(function(a, b) {
                 // Turn your strings into dates, and then subtract them
