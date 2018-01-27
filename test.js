@@ -8,13 +8,15 @@ var gitDriver = require('./github')
 //FIXME gitlab!
 var driver = new gitDriver()
 
-d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
-    //        d = driver.loadIssueData('fastlane/fastlane', 11702).then(function(dd) {
+//d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
+            d = driver.loadIssueData('fastlane/fastlane', 11627).then(function(dd) {
 
 
-    var comments = [].concat(dd.issue_comments, dd.pr_reviews, dd.pr_comments)
+    var comments = [].concat(dd.issue_comments, dd.pr_reviews)
     comments = comments.filter(function(n) {
-        if (n && n.in_reply_to_id) return false
+        //Kick out reply's - we only need reviews and issue-comments
+      //if(n && n.in_reply_to_id) return false
+      //  if(n.state == ' APPROVED') return false
         return n != undefined
     })
 
@@ -36,48 +38,43 @@ d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
     var timeline = []
     comments.forEach(function(com) {
 
-        if (comments_seen[com.id] === true) return;
+      if (comments_seen[com.id] === true) return;
 
         var commentPayload = {
             comment: com,
             children: []
         }
         var skip_it = false
-        dd.pr_reviews.forEach(function(rev) {
-            if (comments_seen[rev.id] === true) {
-                return
-            }
-            if (rev.id == com.pull_request_review_id) {
-                commentPayload.comment = rev
-                commentPayload.children.push({
-                        comment: com,
-                        children: []
-                    })
-                    //com = rev
-
-                comments_seen[rev.id] = true
-
-            }
-        })
-
-
 
         dd.pr_comments.forEach(function(pcomment) {
-
-            //if (comments_seen[pcomment.id] === true) return;
-            if (pcomment.in_reply_to_id == com.id || pcomment.pull_request_review_id == com.id) {
-
-                commentPayload.children.push({
+            
+          //if (comments_seen[pcomment.id] === true) return;
+            if (pcomment.pull_request_review_id == com.id) {
+              var pr_comment = {
                     comment: pcomment,
                     children: []
+                };
+
+
+              dd.pr_comments.forEach(function(rcomment) {
+                //    if (comments_seen[rcomment.id] === true) return;
+                if(rcomment.in_reply_to_id == pcomment.id) {
+                   pr_comment.children.push({
+                    comment: rcomment,
+                    children: []
                 })
-                comments_seen[pcomment.id] = true
-                comments_seen[pcomment.pull_request_review_id] = true
+
+                  //comments_seen[rcomment.id] = true
+
+
+                }
+              })
+              comments_seen[pcomment.id] = true
+              commentPayload.children.push(pr_comment);
             }
         })
 
         comments_seen[com.id] = true
-        comments_seen[com.pull_request_review_id] = true
         timeline.push(commentPayload)
 
     })
@@ -86,9 +83,14 @@ d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
     timeline.forEach(function(te) {
         console.log('ID: ' + te.comment.id + '\t' + te.comment.state + '\t' + te.comment.body.substring(0, 20) + 'L: ' + te.children.length + "--_>" + te.comment.pull_request_review_id)
 
-        //console.log(JSON.stringify(te.comment, null, 2))
+      //console.log(JSON.stringify(te.comment, null, 2))
         te.children.forEach(function(tec) {
-            console.log('\t\tID: ' + tec.comment.id + '\t' + tec.comment.state + '\t' + tec.comment.body.substring(0, 20))
+            console.log('\t\tID: ' + tec.comment.id + '\t' + tec.comment.state + '\t' + tec.comment.body.substring(0, 20) + " pr:" + tec.comment.pull_request_review_id + " rr:" + tec.comment.in_reply_to_id)
+              tec.children.forEach(function(tect) {
+            console.log('\t\t\tID: ' + tect.comment.id + '\t' + tect.comment.state + '\t' + tect.comment.body.substring(0, 20) + " pr:" + tect.comment.pull_request_review_id + " rr:" + tect.comment.in_reply_to_id)
+        })
+
+
         })
     })
 
