@@ -48,8 +48,8 @@ var driver = new gitDriver()
 
         dd.pr_comments.forEach(function(pcomment) {
             
-          //if (comments_seen[pcomment.id] === true) return;
-            if (pcomment.pull_request_review_id == com.id) {
+          if (comments_seen[pcomment.id] === true) return;
+            if (pcomment.pull_request_review_id == com.id ) {
               var pr_comment = {
                     comment: pcomment,
                     children: []
@@ -57,14 +57,14 @@ var driver = new gitDriver()
 
 
               dd.pr_comments.forEach(function(rcomment) {
-                //    if (comments_seen[rcomment.id] === true) return;
+                if (comments_seen[rcomment.id] === true) return;
                 if(rcomment.in_reply_to_id == pcomment.id) {
                    pr_comment.children.push({
                     comment: rcomment,
                     children: []
                 })
 
-                  //comments_seen[rcomment.id] = true
+                  comments_seen[rcomment.id] = true
 
 
                 }
