@@ -78,6 +78,10 @@ var driver = new gitDriver()
         timeline.push(commentPayload)
 
     })
+    timeline = timeline.filter(function(f) {
+                if(f && f.comment.state == 'COMMENTED' && f.children.length == 0) return false
+                return f
+              })
 
     console.log('===TIMELINE===')
     timeline.forEach(function(te) {
