@@ -9,7 +9,7 @@ var gitDriver = require('./github')
 var driver = new gitDriver()
 
 //d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
-            d = driver.loadIssueData('fastlane/fastlane', 11627).then(function(dd) {
+            d = driver.loadIssueData('fastlane/fastlane', 11526).then(function(dd) {
 
 
     var comments = [].concat(dd.issue_comments, dd.pr_reviews)
