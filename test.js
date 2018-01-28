@@ -23,7 +23,6 @@ function walkComments(depth = 0, childs) {
     var depthspacer = Array(depth).join("\t")
     childs.forEach(function(entryPayload) {
 
-        console.log(111)
         if (entryPayload.type == 'event') {
             cnt += depthspacer + '──────────────────────────────────────\n'
             cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.event.actor.login + '{/}\n'
@@ -32,17 +31,75 @@ function walkComments(depth = 0, childs) {
                 cnt += depthspacer + " added label: {" + entryPayload.event.label.color + "}" + entryPayload.event.label.name + "{/}\n"
             }
         }
-        if (entryPayload.type == 'comment') {
+        if (entryPayload.comment.type == 'issue_comment') {
 
             cnt += depthspacer + '──────────────────────────────────────\n'
             cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
             cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
             cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
         }
+        if (entryPayload.comment.type == 'pr_review') {
 
+            cnt += depthspacer + '──────────────────────────────────────\n'
+            cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: {underline}' + entryPayload.comment.submitted_at + '{/}\n'
+
+
+
+            if (entryPayload.comment.diff_hunk) {
+                var diff_lines = entryPayload.comment.diff_hunk.split("\n");
+                diff_lines.forEach(function(l, idx) {
+                    var color = "{white-fg}"
+                    if (l.match(/^\-/)) {
+                        color = "{red-fg}"
+                    }
+                    if (l.match(/^\+/)) {
+                        color = "{green-fg}"
+                    }
+                    cnt += color + l + "{/}\n"
+                    if (idx == entryPayload.comment.original_position) {
+                        cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                    }
+
+                })
+            } else {
+                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+            }
+
+
+        }
+        if (entryPayload.comment.type == 'pr_comment') {
+
+            cnt += depthspacer + '──────────────────────────────────────\n'
+            cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
+            cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+            if (entryPayload.comment.diff_hunk) {
+                var diff_lines = entryPayload.comment.diff_hunk.split("\n");
+                diff_lines.forEach(function(l, idx) {
+                    var color = "{white-fg}"
+                    if (l.match(/^\-/)) {
+                        color = "{red-fg}"
+                    }
+                    if (l.match(/^\+/)) {
+                        color = "{green-fg}"
+                    }
+                    cnt += color + l + "{/}\n"
+                    if (idx == entryPayload.comment.original_position) {
+                        cnt += striptags(marked(entryPayload.comment.body)) + '\n'
+                    }
+
+                })
+            } else {
+                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+            }
+
+
+        }
+
+
+        console.log(entryPayload)
         if (entryPayload.children) {
-          //console.error("CHILD", entryPayload)
-            cnt += walkComments(depth + 1, entryPayload.children)
+            //console.error("CHILD", entryPayload)
+            cnt += walkComments(depth, entryPayload.children)
         }
     })
     return cnt
@@ -51,10 +108,8 @@ function walkComments(depth = 0, childs) {
 //d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
 d = driver.getIssueTimeline('hjanuschka/termhawk', 1).then(function(dd) {
         var cnt = ""
-  console.log(dd.timeline)
-  process.exit
         cnt += walkComments(0, dd.timeline)
-  //console.log(cnt)
+        console.log(cnt)
     })
     .catch(function(e) {
         console.error(e)

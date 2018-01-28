@@ -71,12 +71,14 @@ class GithubDriver {
 
                     var commentPayload = {
                         comment: com,
+                        type: "comment",
                         children: []
                     }
                     var skip_it = false
 
                     issue_data.pr_comments.forEach(function(pcomment) {
 
+                        pcomment.type = "pr_comment"
                         if (comments_seen[pcomment.id] === true) return;
                         if (pcomment.pull_request_review_id == com.id) {
                             var pr_comment = {
@@ -90,6 +92,7 @@ class GithubDriver {
                                 if (rcomment.in_reply_to_id == pcomment.id) {
                                     pr_comment.children.push({
                                         comment: rcomment,
+                                        type: "comment",
                                         children: []
                                     })
 
@@ -115,6 +118,7 @@ class GithubDriver {
 
                 issue_data.timeline = timeline
 
+                return Promise.resolve(issue_data)
                 console.log('===TIMELINE===')
                 timeline.forEach(function(te) {
                     console.log('ID: ' + te.comment.id + '\t' + te.comment.state + '\t' + te.comment.body.substring(0, 20) + 'L: ' + te.children.length + "--_>" + te.comment.pull_request_review_id)
@@ -168,7 +172,7 @@ class GithubDriver {
 
             })
             .then(() => {
-                if (newState.is_pr) {
+                if (newState.issue.is_pr) {
                     return self.loadPR(repo, id)
                 } else {
                     return Promise.resolve([])
@@ -179,7 +183,7 @@ class GithubDriver {
                 return Promise.resolve()
             })
             .then(() => {
-                if (newState.is_pr) {
+                if (newState.issue.is_pr) {
                     return self.loadPRReviews(repo, id)
                 } else {
                     return Promise.resolve([])
@@ -191,7 +195,7 @@ class GithubDriver {
             })
             .then(() => {
 
-                if (newState.is_pr) {
+                if (newState.issue.is_pr) {
                     return self.loadPRComments(repo, id)
 
                 } else {
