@@ -114,7 +114,7 @@ class GithubDriver {
 
 
                 issue_data.timeline = timeline
-                return Promise.resolve(issue_data)
+
                 console.log('===TIMELINE===')
                 timeline.forEach(function(te) {
                     console.log('ID: ' + te.comment.id + '\t' + te.comment.state + '\t' + te.comment.body.substring(0, 20) + 'L: ' + te.children.length + "--_>" + te.comment.pull_request_review_id)
@@ -129,6 +129,8 @@ class GithubDriver {
 
                     })
                 })
+
+                return Promise.resolve(issue_data)
 
 
             })

@@ -63,6 +63,7 @@ class IssueView {
             cnt += 'Comments: \n\n'
 
 
+            cnt += self.walkComments(0, this.state.timeline)
 
             self.box.setContent(cnt)
                 //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
@@ -72,6 +73,15 @@ class IssueView {
         }
         self.box.focus()
         this.box.screen.render()
+    }
+    walkComments(depth = 0, childs) {
+        var self = this
+        var cnt = ""
+        childs.forEach(function(entryPayload) {
+            cnt += '──────────────────────────────────────\n'
+            cnt += '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
+        })
+      return cnt
     }
     createView() {
         this.box = blessed.box({
