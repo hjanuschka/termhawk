@@ -62,117 +62,7 @@ class IssueView {
 
             cnt += 'Comments: \n\n'
 
-            var comments = [].concat(this.state.issue_comments, this.state.pr_comments, this.state.pr_reviews)
 
-            comments.sort(function(a, b) {
-                // Turn your strings into dates, and then subtract them
-                // to get a value that is either negative, positive, or zero.
-                var a_date = a.created_at
-                var b_date = b.created_at
-                if (!a.created_at) {
-                    a_date = a.submitted_at
-                }
-                if (!b.created_at) {
-                    b_date = b.submitted_at
-                }
-                return new Date(a_date) - new Date(b_date)
-            })
-
-            comments = comments.filter(function(n) {
-                if (n && n.in_reply_to_id) return false
-                    //if (n && n.body == '') return false
-                return n != undefined
-            })
-            var seen_reviews = {}
-            comments.forEach(function(comment) {
-                if (seen_reviews[comment.id] === true) {
-                    return
-                }
-                seen_reviews[comment.id] = true
-                var reviewed = false
-                if (comment && comment.pull_request_review_id || comment.state) {
-                    //comment.created_at = comment.submitted_at
-                    reviewed = comment.state
-                    if (!comment.created_at) comment.created_at = comment.submitted_at
-                    self.state.pr_reviews.forEach(function(r) {
-                        if (r.id == comment.pull_request_review_id) {
-                            reviewed = r.state
-                        }
-                    })
-                }
-                cnt += '\n'
-                cnt += '──────────────────────────────────────\n'
-                cnt += '{#00ff00-fg}User:{/} {underline}' + comment.user.login + '{/}\n'
-                if (reviewed) {
-                    cnt += '{white-bg}{black-fg}Review Added{/}: ' + reviewed + '\n'
-                }
-                cnt += '{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
-                cnt += '\n'
-
-
-
-                self.state.pr_reviews.forEach(function(p) {
-                    if (p.id == comment.pull_request_review_id) {
-                        cnt += striptags(marked(p.body)) + '\n'
-                        seen_reviews[p.id] = true
-                    }
-                })
-
-
-                if (comment.diff_hunk) {
-                    cnt += '{yellow-fg}' + comment.path + '{/}\n'
-                    var diff_lines = comment.diff_hunk.split('\n')
-                    diff_lines.forEach(function(l, idx) {
-                            var color = '{white-fg}'
-                            if (l.match(/^\-/)) {
-                                color = '{red-fg}'
-                            }
-                            if (l.match(/^\+/)) {
-                                color = '{green-fg}'
-                            }
-                            cnt += color + l + '{/}\n'
-                            if (idx == comment.original_position) {}
-
-                        })
-                        //Find answers
-                    self.state.pr_comments.forEach(function(pcomment) {
-                        if (pcomment.in_reply_to_id == comment.id || pcomment.id == comment.id) {
-
-                            cnt += '\t\t──────────────────────────────────────\n'
-                            cnt += '\t\t{#00ff00-fg}User:{/} {underline}' + pcomment.user.login + '{/}\n'
-                            cnt += '\t\t{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
-                            striptags(marked(pcomment.body)).split('\n').forEach(function(l) {
-                                cnt += '\t\t' + l + '\n'
-                            })
-
-                            seen_reviews[pcomment.id] = true
-                        }
-                    })
-                } else {
-                    cnt += striptags(marked(comment.body)) + '\n'
-                    self.state.pr_comments.forEach(function(pcomment) {
-                        if (pcomment.in_reply_to_id == comment.id) {
-
-                            cnt += '\t\t──────────────────────────────────────\n'
-                            cnt += '\t\t{#00ff00-fg}User:{/} {underline}' + pcomment.user.login + '{/}\n'
-                            cnt += '\t\t{#00ff00-fg}Created:{/} {underline}' + comment.created_at + '{/}\n'
-
-                            seen_reviews[pcomment.id] = true
-                            striptags(marked(pcomment.body)).split('\n').forEach(function(l) {
-                                cnt += '\t\t' + l + '\n'
-                            })
-                        }
-                    })
-
-
-                }
-
-
-
-                //cnt += JSON.stringify(comment, null, 2);
-                self.root.screen.debug(JSON.stringify(comment, null, 2))
-                cnt += '\n'
-            })
 
             self.box.setContent(cnt)
                 //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
@@ -224,7 +114,7 @@ class IssueView {
     }
     loadData() {
         var self = this
-        self.driver.loadIssueData(self.payload.repo, self.payload.id)
+        self.driver.getIssueTimeline(self.payload.repo, self.payload.id)
             .then(function(issueData) {
                 self.setState(issueData)
             })
