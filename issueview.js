@@ -51,6 +51,8 @@ class IssueView {
             cnt += '{#00ff00-fg}User:{/} {underline}' + this.state.issue.user.login + '{/}\n'
             cnt += '{#00ff00-fg}State:{/} {underline}' + this.state.issue.state + '{/}\n'
             cnt += '{#00ff00-fg}Created:{/} {underline}' + this.state.issue.created_at + '{/} Modified: {underline}' + this.state.issue.updated_at + '{/}\n'
+
+            cnt += "--------------------------------------------------------------------------\n"
             cnt += pr_info + '\n'
             if (this.state.issue.labels) {
                 cnt += 'Labels: \n'
@@ -151,12 +153,15 @@ class IssueView {
 
                 cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
                 cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+                cnt += depthspacer + "--------------------------------------------------------------------------\n"
                 cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+
             }
             if (entryPayload.comment.type == 'pr_review') {
 
                 cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: {underline}' + entryPayload.comment.submitted_at + '{/}\n'
                 cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
+                cnt += depthspacer + "--------------------------------------------------------------------------\n"
 
 
               //depth = depth + 1
@@ -189,6 +194,7 @@ class IssueView {
 
                 cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
                 cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+                cnt += depthspacer + "--------------------------------------------------------------------------\n"
                 if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
                     var diff_lines = entryPayload.comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
