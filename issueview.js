@@ -11,7 +11,7 @@ class IssueView {
         this.root = root
         this.payload = payload
         this.driver = driver
-
+        this.buttons = []
         this.offset = 2
         this.state = {
             issue: false
@@ -234,6 +234,7 @@ class IssueView {
                 shrink: true,
                 top: self.offset,
                 content: cnt,
+                clickable: true,
                 parent: self.box
             })
 
@@ -255,8 +256,14 @@ class IssueView {
                 height: 1,
                 tags: true,
                 content: 'add reply',
+                mouse: true,
+                keys: true,
                 parent: self.box
             })
+          btn1.on("press", function() {
+            console.log("click")
+          })
+          self.buttons.push(btn1)
 
             if (entryPayload.children) {
                 //console.error("CHILD", entryPayload)
