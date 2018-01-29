@@ -81,7 +81,7 @@ class IssueView {
         childs.forEach(function(entryPayload) {
 
             if (entryPayload.type == 'event') {
-                if (['subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
+                if (['comment_deleted', 'subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
                     return
                 }
                 cnt += depthspacer + '──────────────────────────────────────\n'

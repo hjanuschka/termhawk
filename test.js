@@ -105,12 +105,7 @@ function walkComments(depth = 0, childs) {
     return cnt
 }
 
-//d = driver.loadIssueData('hjanuschka/termhawk', 1).then(function(dd) {
-d = driver.getIssueTimeline('hjanuschka/termhawk', 1).then(function(dd) {
-        var cnt = ""
-        cnt += walkComments(0, dd.timeline)
-        console.log(cnt)
-    })
-    .catch(function(e) {
-        console.error(e)
-    })
+driver.getNotifications().then(function(a, b) {
+
+  console.log(a)
+})

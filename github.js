@@ -1,8 +1,19 @@
 var github = require('octonode')
 
+const octokit = require('@octokit/rest')({
+    debug: true
+})
+
+
+
 class GithubDriver {
     constructor() {
         this.client = github.client(process.env.github_token)
+        octokit.authenticate({
+            type: 'token',
+            token: process.env.github_token
+        })
+
     }
     markNotificationAsRead(id) {
         var self = this
@@ -144,7 +155,7 @@ class GithubDriver {
     }
     getCommitsForPR(repo, id) {
         var pr = this.client.pr(repo, id)
-        //var self = this
+            //var self = this
         return new Promise(function(resolve, reject) {
             pr.commits(function(error, commits) {
                 //FIXME normalize
@@ -242,17 +253,12 @@ class GithubDriver {
     }
     loadIssueComments(repo, id) {
         var self = this
-        return new Promise(function(resolve, reject) {
-            var issue = self.client.issue(repo, id)
-            issue.comments(function(error, comments) {
-                if (error) {
-                    resolve([])
-                    return
-                }
-                //FIXME: normalize
-                resolve(comments)
-            })
-        })
+        var a = repo.split("/");
+        return self.paginate(octokit.issues.getComments, {
+            owner: a[0],
+            repo: a[1],
+            number: id
+        });
 
 
     }
@@ -302,11 +308,24 @@ class GithubDriver {
             })
         })
     }
-
+    async paginate(method, def = {}) {
+        var opts = Object.assign({
+            per_page: 300
+        }, def);
+        let response = await method(opts);
+        let {
+            data
+        } = response
+        while (octokit.hasNextPage(response)) {
+            response = await octokit.getNextPage(response)
+            data = data.concat(response.data)
+        }
+        return data
+    }
     getNotifications(options = {}) {
         var self = this
-        return new Promise(function(resolve, reject) {
-            self.client.me().notifications(options, function(err, notifications) {
+        return self.paginate(octokit.activity.getNotifications)
+            .then(function(notifications) {
                 var transformed = []
                 notifications.forEach(function(noti) {
                     var matches = noti.subject.url.match(/.*\/([0-9]+$)/)
@@ -317,10 +336,9 @@ class GithubDriver {
                         target_id: matches[1]
                     })
                 })
-                resolve(transformed)
-            })
-        })
+                return Promise.resolve(transformed);
 
+            });
     }
 }
 

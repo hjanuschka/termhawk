@@ -9,12 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@octokit/rest": "^14.0.7",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.5",
     "marked": "^0.3.12",
     "marked-terminal": "^2.0.0",
     "node-fetch": "^1.7.3",
     "octonode": "^0.9.1",
+    "parse-link-header": "^1.0.1",
     "striptags": "^3.1.1"
   }
 }
