@@ -42,7 +42,7 @@ class NotificationView {
     }
     loadData() {
         var self = this
-        self.driver.getNotifications({})
+        self.driver.getNotifications({all: false, page: 1, per_page: 100})
             .then(function(notifications) {
                 self.setState({
                     notifications: notifications,
