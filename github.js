@@ -17,11 +17,8 @@ class GithubDriver {
     }
     markNotificationAsRead(id) {
         var self = this
-        return new Promise(function(resolve, reject) {
-            self.client.notification(id).markAsRead(function(error, items) {
-                resolve()
-            })
-
+        return octokit.activity.markNotificationThreadAsRead({
+            id: id
         })
     }
     getIssueTimeline(repo, id) {
@@ -154,23 +151,26 @@ class GithubDriver {
 
     }
     getCommitsForPR(repo, id) {
-        var pr = this.client.pr(repo, id)
-            //var self = this
-        return new Promise(function(resolve, reject) {
-            pr.commits(function(error, commits) {
-                //FIXME normalize
-                var transformed = []
-                commits.forEach(function(commit) {
-                    transformed.push({
-                        sha: commit.commit.tree.sha,
-                        committer: {
-                            name: commit.commit.committer.name
-                        },
-                        message: commit.commit.message
-                    })
+        var a = repo.split("/");
+        var self = this;
+        return self.paginate(octokit.pullRequests.getCommits, {
+            number: id,
+            owner: a[0],
+            repo: a[1]
+        }).then(commits => {
+            //Transform Them
+            var transformed = []
+            commits.forEach(function(commit) {
+                transformed.push({
+                    sha: commit.commit.tree.sha,
+                    committer: {
+                        name: commit.commit.committer.name
+                    },
+                    message: commit.commit.message
                 })
-                resolve(transformed)
             })
+            return Promise.resolve(transformed);
+
         })
     }
     loadIssueData(repo, id) {
@@ -239,16 +239,20 @@ class GithubDriver {
         //pr
         //and comments/timeline
         var self = this
-        return new Promise(function(resolve, reject) {
-            var issue = self.client.issue(repo, id)
-            issue.info(function(error, issue_detail) {
-                //FIXME: normalize
-                if (issue_detail.pull_request) {
-                    issue_detail.is_pr = true
-                    issue_detail.diff_url = issue_detail.pull_request.diff_url
-                }
-                resolve(issue_detail)
-            })
+        var a = repo.split("/");
+        return octokit.issues.get({
+            owner: a[0],
+            repo: a[1],
+            number: id
+        }).then(response => {
+						var issue_detail = response.data
+            //FIXME: normalize
+            if (issue_detail.pull_request) {
+                issue_detail.is_pr = true
+                issue_detail.diff_url = issue_detail.pull_request.diff_url
+            }
+            return Promise.resolve(issue_detail);
+
         })
     }
     loadIssueComments(repo, id) {
