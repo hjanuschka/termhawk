@@ -66,7 +66,7 @@ class IssueView {
             cnt += self.walkComments(0, this.state.timeline)
 
             self.box.setContent(cnt)
-                //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
+            //self.box.setContent(JSON.stringify(this.state.pr_comments, null, 2))
 
 
 
@@ -76,12 +76,12 @@ class IssueView {
     }
     walkComments(depth = 0, childs) {
         var self = this
-        var cnt = ""
-        var depthspacer = Array(depth).join("\t")
+        var cnt = ''
+        var depthspacer = Array(depth).join('\t')
         childs.forEach(function(entryPayload) {
 
             if (entryPayload.type == 'event') {
-                if (["subscribed", "mentioned", "referenced"].includes(entryPayload.event.event)) {
+                if (['subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
                     return
                 }
                 cnt += depthspacer + '──────────────────────────────────────\n'
@@ -89,36 +89,36 @@ class IssueView {
                 cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.event.created_at + '{/}\n'
                 var handled = false
                 if (entryPayload.event.event == 'labeled') {
-                    cnt += depthspacer + " added label: {#" + entryPayload.event.label.color + "-bg}" + entryPayload.event.label.name + "{/}\n"
+                    cnt += depthspacer + ' added label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
                     handled = true
 
                 }
                 if (entryPayload.event.event == 'unlabeled') {
-                    cnt += depthspacer + " removed label: {#" + entryPayload.event.label.color + "-bg}" + entryPayload.event.label.name + "{/}\n"
+                    cnt += depthspacer + ' removed label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
                     handled = true
 
                 }
 
                 if (entryPayload.event.event == 'closed') {
-                    cnt += depthspacer + "  clossed this! \n"
+                    cnt += depthspacer + '  clossed this! \n'
                     handled = true
                 }
 
                 if (entryPayload.event.event == 'renamed') {
-                    cnt += depthspacer + " Renamed from: '" + entryPayload.event.rename.from + "' \n"
-                    cnt += depthspacer + "           to: '" + entryPayload.event.rename.to + "' \n"
+                    cnt += depthspacer + ' Renamed from: \'' + entryPayload.event.rename.from + '\' \n'
+                    cnt += depthspacer + '           to: \'' + entryPayload.event.rename.to + '\' \n'
                     handled = true
                 }
                 if (entryPayload.event.event == 'merged') {
-                    cnt += depthspacer + " merged this! \n"
+                    cnt += depthspacer + ' merged this! \n'
                     handled = true
                 }
                 if (entryPayload.event.event == 'head_ref_deleted') {
-                    cnt += depthspacer + " PR branch removed \n"
+                    cnt += depthspacer + ' PR branch removed \n'
                     handled = true
                 }
                 if (handled === false) {
-                    cnt += depthspacer + " " + JSON.stringify(entryPayload.event, null, 2) + "\n"
+                    cnt += depthspacer + ' ' + JSON.stringify(entryPayload.event, null, 2) + '\n'
                 }
 
             }
@@ -133,24 +133,24 @@ class IssueView {
 
                 cnt += depthspacer + '──────────────────────────────────────\n'
                 cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: {underline}' + entryPayload.comment.submitted_at + '{/}\n'
-                cnt += depthspacer + "{white-bg}{black-fg}Review Added{/}: " + entryPayload.comment.state + "\n";
+                cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
 
 
                 depth = depth+1
-                depthspacer = Array(depth).join("\t")
+                depthspacer = Array(depth).join('\t')
 
 
                 if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
-                    var diff_lines = entryPayload.comment.diff_hunk.split("\n");
+                    var diff_lines = entryPayload.comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
-                        var color = "{white-fg}"
+                        var color = '{white-fg}'
                         if (l.match(/^\-/)) {
-                            color = "{red-fg}"
+                            color = '{red-fg}'
                         }
                         if (l.match(/^\+/)) {
-                            color = "{green-fg}"
+                            color = '{green-fg}'
                         }
-                        cnt += depthspacer + color + l + "{/}\n"
+                        cnt += depthspacer + color + l + '{/}\n'
                         if (idx == entryPayload.comment.original_position) {
                             cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
                         }
@@ -168,16 +168,16 @@ class IssueView {
                 cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
                 cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
                 if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
-                    var diff_lines = entryPayload.comment.diff_hunk.split("\n");
+                    var diff_lines = entryPayload.comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
-                        var color = "{white-fg}"
+                        var color = '{white-fg}'
                         if (l.match(/^\-/)) {
-                            color = "{red-fg}"
+                            color = '{red-fg}'
                         }
                         if (l.match(/^\+/)) {
-                            color = "{green-fg}"
+                            color = '{green-fg}'
                         }
-                        cnt += depthspacer + color + l + "{/}\n"
+                        cnt += depthspacer + color + l + '{/}\n'
                         if (idx == entryPayload.comment.original_position) {
                             cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
                         }
