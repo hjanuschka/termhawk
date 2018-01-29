@@ -1,5 +1,3 @@
-var github = require('octonode')
-
 const octokit = require('@octokit/rest')({
     debug: true
 })
@@ -8,11 +6,11 @@ const octokit = require('@octokit/rest')({
 
 class GithubDriver {
     constructor() {
-        this.client = github.client(process.env.github_token)
         octokit.authenticate({
             type: 'token',
             token: process.env.github_token
         })
+				this.client = octokit;
 
     }
     markNotificationAsRead(id) {
@@ -245,8 +243,8 @@ class GithubDriver {
             repo: a[1],
             number: id
         }).then(response => {
-						var issue_detail = response.data
-            //FIXME: normalize
+            var issue_detail = response.data
+                //FIXME: normalize
             if (issue_detail.pull_request) {
                 issue_detail.is_pr = true
                 issue_detail.diff_url = issue_detail.pull_request.diff_url
@@ -268,48 +266,49 @@ class GithubDriver {
     }
     loadIssueEvents(repo, id) {
         var self = this
-        return new Promise(function(resolve, reject) {
-            var pr = self.client.get('/repos/' + repo + '/issues/' + id + '/events', {}, function(err, code, events) {
-                resolve(events)
-            })
+        var a = repo.split("/");
+        return self.paginate(octokit.issues.getEvents, {
+            owner: a[0],
+            repo: a[1],
+            issue_number: id
+        }).then(events => {
+            return Promise.resolve(events);
         })
-
     }
     loadPRComments(repo, id) {
         var self = this
-        return new Promise(function(resolve, reject) {
-            var pr = self.client.pr(repo, id)
-            pr.comments(function(error, comments) {
-                //FIXME: normalize
-                resolve(comments)
-            })
+        var a = repo.split("/");
+        return self.paginate(octokit.pullRequests.getComments, {
+            repo: a[1],
+            owner: a[0],
+            number: id
+        }).then(comments => {
+            return Promise.resolve(comments)
         })
 
 
     }
     loadPRReviews(repo, id) {
         var self = this
-        return new Promise(function(resolve, reject) {
-            var pr = self.client.pr(repo, id)
-            pr.reviews(function(error, reviews) {
-                //FIXME: normalize
-                resolve(reviews)
-            })
+        var a = repo.split("/");
+        return self.paginate(octokit.pullRequests.getReviews, {
+            repo: a[1],
+            owner: a[0],
+            number: id
+        }).then(reviews => {
+            return Promise.resolve(reviews)
         })
 
     }
     loadPR(repo, id) {
-        //Loads an Issue, and returns
-        //issue
-        //pr
-        //and comments/timeline
         var self = this
-        return new Promise(function(resolve, reject) {
-            var pr = self.client.pr(repo, id)
-            pr.info(function(error, pr_detail) {
-                //FIXME: normalize
-                resolve(pr_detail)
-            })
+        var a = repo.split("/");
+        return octokit.pullRequests.get({
+            owner: a[0],
+            repo: a[1],
+            number: id
+        }).then(result => {
+            return Promise.resolve(result.data)
         })
     }
     async paginate(method, def = {}) {

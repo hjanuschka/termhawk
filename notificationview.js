@@ -128,7 +128,7 @@ class NotificationView {
             //not.repo ='hjanuschka/termhawk'
             //id=1;
             //not.repo = 'fastlane/fastlane'
-            //id=11702
+            //id=11418
             var issue = new IssueView(self.root, self.driver, {
                 repo: not.repo,
                 id: id

@@ -8,6 +8,6 @@ var gitDriver = require('./github')
 //FIXME gitlab!
 var driver = new gitDriver()
 
-driver.loadIssue("fastlane/fastlane", 11418).then(function(d) {
+driver.loadPRComments("fastlane/fastlane", 11418).then(function(d) {
 console.log(d)
 });
