@@ -10,8 +10,18 @@ class GithubDriver {
             type: 'token',
             token: process.env.github_token
         })
-				this.client = octokit;
+        this.client = octokit;
 
+    }
+    createIssueComment(repo, id, payload) {
+
+        var a = repo.split("/");
+        return octokit.issues.createComment({
+            owner: a[0],
+            repo: a[1],
+            number: id,
+            body: payload.body
+        });
     }
     markNotificationAsRead(id) {
         var self = this
