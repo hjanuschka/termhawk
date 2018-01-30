@@ -3,8 +3,7 @@ var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var striptags = require('striptags')
 var fetch = require('node-fetch')
-var issuecomments = require('./issuecomments')
-
+var ReplyBox = require("./replybox")
 
 class IssueView {
     constructor(root, driver, payload) {
@@ -393,84 +392,6 @@ class IssueView {
             })
     }
 
-    renderReplyBox(id = null) {
-        var self = this
-        var form = blessed.form({
-            parent: self.root,
-            mouse: true,
-            keys: true,
-            vi: true,
-            label: 'Compose Reply for #' + self.payload.id,
-            left: 'center',
-            top: 'center',
-            width: '80%',
-            height: '80%',
-            border: 'line',
-            content: 'foobar',
-            scrollable: true,
-        })
-        form.on('submit', function(data) {
-            console.log(JSON.stringify(data, null, 2))
-
-            self.driver.createIssueComment(self.payload.repo, self.payload.id, {
-                body: data.text
-            }).then(result => {
-                self.loadData()
-                    //FIXME scroll to end
-                self.root.remove(form)
-                self.box.screen.render()
-            })
-        })
-        var text = blessed.textarea({
-            parent: form,
-            mouse: true,
-            vi: true,
-            keys: true,
-            style: {
-                bg: 'blue'
-            },
-            height: 10,
-            width: '80%',
-            left: 'center',
-            top: 3,
-            name: 'text'
-        })
-
-        var submit = blessed.button({
-            parent: form,
-            mouse: true,
-            keys: true,
-            shrink: true,
-            padding: {
-                left: 1,
-                right: 1
-            },
-            left: 'center',
-            top: 20,
-            name: 'submit',
-            content: 'submit',
-            style: {
-                bg: 'blue',
-                focus: {
-                    bg: 'red'
-                }
-            }
-        })
-
-        submit.on('press', function() {
-            form.submit()
-        })
-
-        text.on('focus', function() {
-            text.readInput()
-        })
-        form.focus()
-        text.key('C-e', function() {
-            //text.readEditor(function(err, data) {})
-        })
-
-        self.root.screen.render()
-    }
     renderCommitBox() {
         var self = this
         var data = [
@@ -558,7 +479,12 @@ class IssueView {
             }
         })
         this.box.key(['S-r'], function() {
-            self.renderReplyBox()
+            var _replybox = new ReplyBox(self.root, self.driver, self.payload)
+            _replybox.createView();
+            _replybox.form.on("hawk_done", function() {
+                //Fixme scroll to end
+                self.loadData();
+            })
         })
         this.box.key(['S-m'], function() {
             self.driver.merge(self.payload.repo, self.payload.id).then(function() {
@@ -578,7 +504,7 @@ class IssueView {
                 msg.display("Merged This!", function(e, m) {
                     //FIXME something
                 });
-								self.root.screen.render();
+                self.root.screen.render();
             })
 
         })
