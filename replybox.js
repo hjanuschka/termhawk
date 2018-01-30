@@ -1,12 +1,14 @@
 var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
+var EventEmitter = require('events')
 
 
-class ReplyBox {
+class ReplyBox extends EventEmitter {
 
     constructor(root, driver, payload) {
 
+        super()
         this.root = root
         this.payload = payload
         this.driver = driver
@@ -31,7 +33,7 @@ class ReplyBox {
             self.driver.createIssueComment(self.payload.repo, self.payload.id, {
                 body: data.text
             }).then(result => {
-                self.form.emit('hawk_done');
+                self.emit('hawk_done')
                 self.root.remove(self.form)
                 self.root.screen.render()
             })
