@@ -1,42 +1,59 @@
-var blessed = require( 'blessed' )
+var blessed = require('blessed')
 var notificationView = require('./notificationview.js')
 var BottomBar = require('./bottombar.js')
-var gitDriver = require("./github")
+var gitDriver = require('./github')
+var issueView = require('./issueview')
 
 // Create a screen object.
-var screen = blessed.screen( { 'smartCSR': true, autoPadding: false,
+var screen = blessed.screen({
+    'smartCSR': true,
+    autoPadding: false,
     fullUnicode: true,
-debug: true,
-    warnings: true} )
+    debug: true,
+    warnings: true
+})
 
 
 screen.title = 'TermHawk'
 
 //FIXME gitlab!
-var driver = new gitDriver();
+var driver = new gitDriver()
 
 
 // Create a box perfectly centered horizontally and vertically.
-var box = blessed.box( {
-    'border': { 'type': 'line' },
+var box = blessed.box({
+    'border': {
+        'type': 'line'
+    },
     'parent': screen,
     'content': 'Hello {bold}world{/bold}!',
     'height': '100%',
     'width': '100%',
     'style': {
         'bg': 'magenta',
-        'border': { 'fg': '#f0f0f0' },
+        'border': {
+            'fg': '#f0f0f0'
+        },
         'fg': 'white',
-        'hover': { 'bg': 'green' }
+        'hover': {
+            'bg': 'green'
+        }
     }
-} )
+})
 
-screen.append( box )
+screen.append(box)
 
-var notify_view = new notificationView(screen, driver)
-notify_view.createTable()
+if (process.env.issue_test) {
+    var issue_view = new issueView(screen, driver, {repo: 'hjanuschka/termhawk', id:1})
+    issue_view.createView()
+    issue_view.focus()
+} else {
+
+    var notify_view = new notificationView(screen, driver)
+    notify_view.createTable()
 
 
+}
 
 var bottom_bar = new BottomBar(screen)
 bottom_bar.createView()
@@ -58,13 +75,13 @@ screen.key([
     screen.render()
 })
 // Quit on Escape, q, or Control-C.
-screen.key( [
+screen.key([
     'escape',
     'q',
     'C-c'
-], function( ch, key ) {
-    return process.exit( 0 )
-} )
+], function(ch, key) {
+    return process.exit(0)
+})
 
 // Focus our element.
 box.focus()
