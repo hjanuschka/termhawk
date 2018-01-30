@@ -72,7 +72,6 @@ class IssueView {
                 border: 'line',
                 width: '100%-2',
                 height: 'shrink',
-                clickable: true,
                 padding: {
                     left: 0,
                     right: 0
@@ -236,7 +235,6 @@ class IssueView {
                     shrink: true,
                     top: self.offset,
                     content: cnt,
-                    clickable: true,
                     parent: self.box
                 })
 
@@ -418,7 +416,7 @@ class IssueView {
                 body: data.text
             }).then(result => {
                 self.loadData()
-								//FIXME scroll to end
+                    //FIXME scroll to end
                 self.root.remove(form)
                 self.box.screen.render()
             })
@@ -561,6 +559,28 @@ class IssueView {
         })
         this.box.key(['S-r'], function() {
             self.renderReplyBox()
+        })
+        this.box.key(['S-m'], function() {
+            self.driver.merge(self.payload.repo, self.payload.id).then(function() {
+                var msg = blessed.message({
+                    parent: self.root,
+                    border: 'line',
+                    height: '20',
+                    width: 'half',
+                    top: 'center',
+                    left: 'center',
+                    label: ' {blue-fg}Merged!{/blue-fg} ',
+                    tags: true,
+                    keys: true,
+                    hidden: true,
+                    vi: true
+                })
+                msg.display("Merged This!", function(e, m) {
+                    //FIXME something
+                });
+								self.root.screen.render();
+            })
+
         })
 
         this.box.key(['h'], function(ch, key) {
