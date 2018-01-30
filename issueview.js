@@ -413,6 +413,16 @@ class IssueView {
         })
         form.on('submit', function(data) {
             console.log(JSON.stringify(data, null, 2))
+
+            self.driver.client.issues.createComment({
+                owner: 'hjanuschka',
+                repo: 'termhawk',
+                number: 1,
+                body: data.text
+            }).then(result => {
+                self.root.remove(form)
+                self.box.screen.render()
+            })
         })
         var text = blessed.textarea({
             parent: form,
@@ -424,7 +434,7 @@ class IssueView {
             },
             height: 10,
             width: '80%',
-            left: "center",
+            left: 'center',
             top: 3,
             name: 'text'
         })
@@ -438,7 +448,7 @@ class IssueView {
                 left: 1,
                 right: 1
             },
-            left: "center",
+            left: 'center',
             top: 20,
             name: 'submit',
             content: 'submit',
