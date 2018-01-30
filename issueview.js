@@ -71,6 +71,8 @@ class IssueView {
                 tags: true,
                 border: 'line',
                 width: '100%-2',
+								height: "shrink",
+								clickable: true,
                 padding: {
                     left: 0,
                     right: 0
