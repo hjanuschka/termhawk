@@ -1,5 +1,6 @@
 var blessed = require('blessed')
 var IssueView = require('./issueview')
+var theme = require("./theme")
 
 class NotificationView {
     constructor(root, driver) {
@@ -68,20 +69,23 @@ class NotificationView {
             'width': '100%',
             'style': {
                 'border': {
-                    'fg': 'white'
+                  'fg': theme.accent.bg,
+                  'bg': theme.primary.bg,
+
+
                 },
                 'header': {
-                    'fg': 'black',
-                    'bg': '#FD971F',
+                    'fg': theme.accent.fg,
+                    'bg': theme.accent.bg,
                     'bold': true
                 },
-                'bg': '#272822',
+                'bg': theme.primary.bg,
                 'cell': {
-                    'fg': 'white',
-                    'bg': '#272822',
+                    'fg': theme.primary.fg,
+                    'bg': theme.primary.bg,
                     'selected': {
-                        'bg': '#FD971f',
-                        'fg': 'black'
+                        'bg': theme.secondary.bg,
+                        'fg': theme.secondary.fg
                     }
                 }
             }

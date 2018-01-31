@@ -1,4 +1,5 @@
 var blessed = require('blessed')
+var theme = require("./theme")
 
 class BottomBar {
     constructor(root) {
@@ -26,6 +27,7 @@ class BottomBar {
             padding: 0,
             vi: true,
             style: {
+                bg: theme.primary.bg,
                 item: {
                     bg: 'magenta',
                     fg: 'white'

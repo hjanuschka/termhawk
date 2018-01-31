@@ -6,6 +6,8 @@ var striptags = require('striptags')
 var ReplyBox = require('./replybox')
 var DiffBox = require('./diffbox')
 
+var theme = require('./theme')
+
 class IssueView {
     constructor(root, driver, payload) {
         this.root = root
@@ -80,7 +82,14 @@ class IssueView {
                 },
                 parent: self.box,
                 top: self.offset,
-                left: 1
+                left: 1,
+                style: {
+                    border: {
+                      fg: theme.accent.bg,
+                      bg: theme.primary.bg
+                    },
+                    bg: theme.primary.bg
+                }
 
             })
 
@@ -262,7 +271,16 @@ class IssueView {
                 shrink: true,
                 top: self.offset,
                 content: cnt,
-                parent: self.box
+                parent: self.box,
+                style: {
+                    border: {
+                      fg: theme.primary.bg,
+                      bg: theme.primary.fg
+                    },
+                    bg: theme.primary.bg,
+                    fg: theme.primary.fg
+                }
+
             })
 
             box2.parseContent()
@@ -334,11 +352,12 @@ class IssueView {
             'top': 0,
             'left': 0,
             'style': {
-                'bg': 'black',
+                'bg': theme.primary.bg,
                 'border': {
-                    'fg': '#f0f0f0'
+                  'fg': theme.accent.fg,
+                  'bg': theme.primary.bg
                 },
-                'fg': 'white',
+                'fg': theme.primary.fg,
             }
         })
         this.box.enableInput()

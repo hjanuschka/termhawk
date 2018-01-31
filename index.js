@@ -4,6 +4,7 @@ var BottomBar = require('./bottombar.js')
 var gitDriver = require('./github')
 var issueView = require('./issueview')
 var MDBox = require('./mdbox')
+var theme = require("./theme")
 
 // Create a screen object.
 var screen = blessed.screen({
@@ -11,6 +12,9 @@ var screen = blessed.screen({
     autoPadding: false,
     fullUnicode: true,
     debug: true,
+  style: {
+    bg: theme.primary.bg
+  },
     warnings: true
 })
 
@@ -21,28 +25,6 @@ screen.title = 'TermHawk'
 var driver = new gitDriver()
 
 
-// Create a box perfectly centered horizontally and vertically.
-var box = blessed.box({
-    'border': {
-        'type': 'line'
-    },
-    'parent': screen,
-    'content': 'Hello {bold}world{/bold}!',
-    'height': '100%',
-    'width': '100%',
-    'style': {
-        'bg': 'magenta',
-        'border': {
-            'fg': '#f0f0f0'
-        },
-        'fg': 'white',
-        'hover': {
-            'bg': 'green'
-        }
-    }
-})
-
-screen.append(box)
 
 if (process.env.issue_test) {
     var issue_view = new issueView(screen, driver, {repo: 'hjanuschka/termhawk', id:1})
@@ -71,9 +53,6 @@ screen.key(['e'], function(ch, key) {
 screen.key([
     'w'
 ], function(ch, key) {
-    box.toggle()
-    table.focus()
-    screen.render()
 })
 // Quit on Escape, q, or Control-C.
 screen.key([
@@ -102,8 +81,6 @@ screen.key([
 
 
 
-// Focus our element.
-box.focus()
 
 // Render the screen.
 screen.render()
