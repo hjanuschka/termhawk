@@ -15,7 +15,7 @@ class IssueView {
         this.driver = driver
         this.buttons = []
         this.selectedButton = 0
-        this.offset = 2 + 2
+        this.offset = 2 + 2 + 2
         this.state = {
             issue: false
         }
@@ -24,7 +24,7 @@ class IssueView {
         this.box.focus()
     }
     setState(state) {
-        this.offset = 2 + 2
+        this.offset = 2 + 2 + 2
         this.state = state
         this.reRender()
     }
@@ -74,7 +74,7 @@ class IssueView {
                 shrink: true,
                 tags: true,
                 border: 'line',
-                width: '100%-2',
+                width: '100%-3',
                 height: 'shrink',
                 padding: {
                     left: 2,
@@ -83,8 +83,11 @@ class IssueView {
                 },
                 parent: self.box,
                 top: self.offset,
+                shadow: true,
                 left: 1,
-style: {
+
+                    style: theme.styles.box,
+astyle: {
                     border: {
                       fg: theme.primary.bg,
                       bg: theme.primary.fg
@@ -98,7 +101,7 @@ style: {
             box1.setContent(cnt)
             box1.parseContent()
             if (box1._clines) {
-                self.offset += box1._clines.length + 3 + 2
+                self.offset += box1._clines.length + 3 + 2 + 2
             } else {
                 self.offset = 0
             }
@@ -109,14 +112,9 @@ style: {
 
             var btn1 = blessed.button({
                 left: 'center',
-                style: {
-                    bg: 'blue',
-                    focus: {
-                        bg: 'red'
 
-                    }
-                },
-                top: self.offset + 2,
+                style: theme.styles.button,
+                top: self.offset + 2 + 2,
                 width: 'shrink',
                 height: 1,
                 tags: true,
@@ -237,14 +235,14 @@ style: {
                 if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
                     var diff_lines = entryPayload.comment.diff_hunk.split('\n')
                     diff_lines.forEach(function(l, idx) {
-                        var color = '{white-fg}'
+                        var color = '{black-bg}{white-fg}'
                         if (l.match(/^\-/)) {
-                            color = '{red-fg}'
+                            color = '{black-bg}{red-fg}'
                         }
                         if (l.match(/^\+/)) {
-                            color = '{green-fg}'
+                            color = '{black-bg}{green-fg}'
                         }
-                        cnt += depthspacer + color + l + '{/}\n'
+                      cnt += depthspacer + color + l + '{/}{/}\n'
                         if (idx == entryPayload.comment.original_position) {
                             cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
                         }
@@ -262,7 +260,7 @@ style: {
 
             var box2 = blessed.box({
                 left: (depth * 1) + 1,
-                width: '100%-' + (depth * 1) + 2,
+                width: '100%-' + (depth * 1) + 4,
                 height: 'shrink',
                 border: 'line',
                 padding: {
@@ -273,8 +271,11 @@ style: {
                 shrink: true,
                 top: self.offset,
                 content: cnt,
+                shadow: true,
                 parent: self.box,
-                style: {
+
+                    style: theme.styles.box,
+                astyle: {
                     border: {
                       fg: theme.primary.bg,
                       bg: theme.primary.fg
@@ -287,7 +288,7 @@ style: {
 
             box2.parseContent()
             if (box2 && box2._clines) {
-                self.offset += box2._clines.length + 3 + 2
+                self.offset += box2._clines.length + 3 + 2 + 2
             } else {
                 //FIXME double renderer?
                 return
@@ -300,12 +301,9 @@ style: {
                 self.walkComments(depth + 1, entryPayload.children, 0)
                 var btn1 = blessed.button({
                     left: 'center',
-                    style: {
-                        bg: 'blue',
-                        focus: {
-                            bg: 'red'
-                        }
-                    },
+
+                    style: theme.styles.button,
+                    
 
                     top: self.offset - 2,
                     width: 'shrink',
@@ -353,8 +351,9 @@ style: {
             'width': '100%',
             'top': 0,
             'left': 0,
-            'style': {
-                'bg': theme.primary.bg,
+            'style': theme.styles.window,
+            'astyle': {
+                'bg': theme.styles.window,
                 'border': {
                   'fg': theme.accent.fg,
                   'bg': theme.primary.bg

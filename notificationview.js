@@ -66,30 +66,10 @@ class NotificationView {
             'wrap': true,
             'height': '100%-3',
             'mouse': true,
-            'width': '100%',
-            'style': {
-                'border': {
-                  'fg': theme.accent.bg,
-                  'bg': theme.primary.bg,
-
-
-                },
-                'header': {
-                    'fg': theme.accent.fg,
-                    'bg': theme.accent.bg,
-                    'bold': true
-                },
-                'bg': theme.primary.bg,
-                'cell': {
-                    'fg': theme.primary.fg,
-                    'bg': theme.primary.bg,
-                    'selected': {
-                        'bg': theme.secondary.bg,
-                        'fg': theme.secondary.fg
-                    }
-                }
-            }
-        })
+            'width': '100%-3',
+          'style': theme.styles.box
+        }
+        )
         this.events()
         this.loadData()
 

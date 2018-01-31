@@ -10,6 +10,43 @@ var Theme = {
     accent: {
         bg: '#F92672',
         fg: 'black'
+    },
+    styles: {
+        button: {
+            bg: 'lightgrey',
+            fg: 'red',
+            focus: {
+                bg: 'red',
+                fg: 'yellow'
+            }
+        },
+        window: {
+            shadow: 'red',
+            bg: 'blue',
+            fg: 'black',
+            border: {
+                bg: 'blue',
+                fg: 'blue'
+            },
+            label: {
+                fg: 'red',
+                bg: 'lightgrey'
+            }
+
+        },
+        box: {
+            shadow: 'red',
+            bg: 'lightgrey',
+            fg: 'black',
+            border: {
+                bg: 'lightgrey',
+                fg: 'black'
+            },
+            label: {
+                fg: 'red',
+                bg: 'lightgrey'
+            }
+        },
     }
 }
 module.exports = Theme

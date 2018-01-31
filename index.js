@@ -14,7 +14,7 @@ var screen = blessed.screen({
     terminal: 'xterm-256color',
     debug: true,
     style: {
-        bg: theme.primary.bg
+        bg: "blue"
     },
     warnings: true
 })
