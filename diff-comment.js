@@ -22,14 +22,16 @@ DiffComment.prototype._selectedPath = ''
  * Add a message to the history.
  * @param {String} msg
  */
-DiffComment.prototype.setDiff = function(msg) {
+DiffComment.prototype.setDiff = function(diff) {
     var self = this
+    self._lines = diff.split("\n")
+
 
 }
 
 DiffComment.prototype.render = function() {
     // Set the widget content.
-    this.setContent(this._messages.join('\n'))
+    this.setContent(this._lines.join('\n'))
 
     // Call the super.
     return this._render()

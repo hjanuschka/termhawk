@@ -1,5 +1,6 @@
 var Blessed = require('blessed')
 var DiffComment = require('./diff-comment')
+var fs = require('fs')
 
 var screen = Blessed.screen({
     smartCSR: true,
@@ -15,5 +16,7 @@ var d = DiffComment({
     width: '100%',
     parent: screen
 })
-screen.render()
 
+var diff_data = fs.readFileSync('./demo.diff', 'utf8')
+d.setDiff(diff_data.toString())
+screen.render()
