@@ -99,6 +99,10 @@ class ReplyBox extends EventEmitter {
             //text.readEditor(function(err, data) {})
         })
 
+      self.form.key(["h"], function() {
+          self.root.remove(self.form);
+          self.root.screen.render();
+      })
         self.root.screen.render()
 
     }

@@ -15,7 +15,7 @@ class IssueView {
         this.driver = driver
         this.buttons = []
         this.selectedButton = 0
-        this.offset = 2
+        this.offset = 2 + 2
         this.state = {
             issue: false
         }
@@ -24,7 +24,7 @@ class IssueView {
         this.box.focus()
     }
     setState(state) {
-        this.offset = 2
+        this.offset = 2 + 2
         this.state = state
         this.reRender()
     }
@@ -77,18 +77,20 @@ class IssueView {
                 width: '100%-2',
                 height: 'shrink',
                 padding: {
-                    left: 0,
+                    left: 2,
+                    top: 2,
                     right: 0
                 },
                 parent: self.box,
                 top: self.offset,
                 left: 1,
-                style: {
+style: {
                     border: {
-                      fg: theme.accent.bg,
-                      bg: theme.primary.bg
+                      fg: theme.primary.bg,
+                      bg: theme.primary.fg
                     },
-                    bg: theme.primary.bg
+                    bg: theme.primary.bg,
+                    fg: theme.primary.fg
                 }
 
             })
@@ -96,7 +98,7 @@ class IssueView {
             box1.setContent(cnt)
             box1.parseContent()
             if (box1._clines) {
-                self.offset += box1._clines.length + 3
+                self.offset += box1._clines.length + 3 + 2
             } else {
                 self.offset = 0
             }
@@ -264,8 +266,8 @@ class IssueView {
                 height: 'shrink',
                 border: 'line',
                 padding: {
-                    left: 0,
-                    right: 0
+                    left: 2,
+                    top: 2,
                 },
                 tags: true,
                 shrink: true,
@@ -285,7 +287,7 @@ class IssueView {
 
             box2.parseContent()
             if (box2 && box2._clines) {
-                self.offset += box2._clines.length + 3
+                self.offset += box2._clines.length + 3 + 2
             } else {
                 //FIXME double renderer?
                 return
