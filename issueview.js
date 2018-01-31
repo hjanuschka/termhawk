@@ -167,6 +167,10 @@ class IssueView {
 
                 }
 
+                if (entryPayload.event.event == 'review_requested') {
+                  cnt += depthspacer + ' Requested review from {bold}' + entryPayload.event.requested_reviewer.login + '{/} \n'
+                    handled = true
+                }
                 if (entryPayload.event.event == 'closed') {
                     cnt += depthspacer + '  clossed this! \n'
                     handled = true
