@@ -23,7 +23,7 @@ class IssueView {
         this.driver = driver
         this.buttons = []
         this.selectedButton = 0
-        this.offset = 2 + 2 + 2
+        this.offset = 2
         this.state = {
             issue: false
         }
@@ -32,7 +32,7 @@ class IssueView {
         this.box.focus()
     }
     setState(state) {
-        this.offset = 2 + 2 + 2
+        this.offset = 2
         this.state = state
         this.reRender()
     }
@@ -105,7 +105,7 @@ class IssueView {
             box1.setContent(cnt)
             box1.parseContent()
             if (box1._clines) {
-                self.offset += box1._clines.length + 3 + 2 + 2
+                self.offset += box1._clines.length + 3 + 2 + 1
             } else {
                 self.offset = 0
             }
@@ -292,7 +292,7 @@ class IssueView {
 
             box2.parseContent()
             if (box2 && box2._clines) {
-                self.offset += box2._clines.length + 3 + 2 + 2
+                self.offset += box2._clines.length + 3 + 2 + 1
             } else {
                 //FIXME double renderer?
                 return
@@ -309,7 +309,7 @@ class IssueView {
                     style: theme.styles.button,
 
 
-                    top: self.offset - 2,
+                    top: self.offset - 3,
                     width: 'shrink',
                     height: 1,
                     tags: true,
@@ -423,7 +423,9 @@ class IssueView {
                     'height': '50%',
                     'mouse': true,
                     'width': '50%',
-                    'style': {
+                    style: theme.styles.box,
+                    shadow: true,
+                    'astyle': {
                         'border': {
                             'fg': 'white'
                         },

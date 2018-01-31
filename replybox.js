@@ -2,6 +2,7 @@ var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var EventEmitter = require('events')
+var theme = require("./theme")
 
 
 class ReplyBox extends EventEmitter {
@@ -34,6 +35,8 @@ class ReplyBox extends EventEmitter {
             border: 'line',
             content: 'foobar',
             scrollable: true,
+            shadow: true,
+            style: theme.styles.box
         })
         self.form.on('submit', function(data) {
             var method = 'createIssueComment'

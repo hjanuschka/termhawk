@@ -13,7 +13,7 @@ var Theme = {
     },
     styles: {
         button: {
-            bg: 'lightgrey',
+            bg: 'lightblue',
             fg: 'red',
             focus: {
                 bg: 'red',

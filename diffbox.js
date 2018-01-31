@@ -1,5 +1,6 @@
 var fetch = require('node-fetch')
 var blessed = require('blessed')
+var theme = require('./theme')
 
 class DiffBox {
 
@@ -44,24 +45,8 @@ class DiffBox {
             'height': '80%',
             'mouse': true,
             'width': '80%',
-            'style': {
-                'border': {
-                    'fg': 'white'
-                },
-                'header': {
-                    'fg': 'black',
-                    'bg': '#FD971F',
-                    'bold': true
-                },
-                'cell': {
-                    'selected': {
-                        'bg': '#FD971f',
-                        'fg': 'black'
-                    }
-
-                },
-                'bg': 'black',
-            }
+            shadow: true,
+            style: theme.styles.box
         })
         diffBox.key(['h'], function() {
             self.root.remove(diffBox)
@@ -88,7 +73,7 @@ class DiffBox {
                     diff.push(color + l + '{/}')
 
                 })
-                diffBox.setContent(diff.join("\n"))
+                diffBox.setContent('' + diff.join('\n') + '')
                 self.root.screen.render()
 
 
