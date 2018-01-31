@@ -33,7 +33,7 @@ class ReplyBox extends EventEmitter {
             width: '80%',
             height: '80%',
             border: 'line',
-            content: 'foobar',
+            content: '',
             scrollable: true,
             shadow: true,
             style: theme.styles.box
