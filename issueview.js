@@ -7,6 +7,14 @@ var ReplyBox = require('./replybox')
 var DiffBox = require('./diffbox')
 
 var theme = require('./theme')
+var chalk = require('chalk')
+
+marked.setOptions({
+    //  Define custom renderer
+    renderer: new TerminalRenderer({codespan: chalk.red, code: chalk.red})
+
+})
+
 
 class IssueView {
     constructor(root, driver, payload) {
@@ -32,10 +40,6 @@ class IssueView {
         var self = this
 
         if (self.state.issue) {
-            marked.setOptions({
-                //  Define custom renderer
-                renderer: new TerminalRenderer()
-            })
 
             var kind = 'Issue'
             var pr_info = ''
@@ -86,11 +90,11 @@ class IssueView {
                 shadow: true,
                 left: 1,
 
-                    style: theme.styles.box,
-astyle: {
+                style: theme.styles.box,
+                astyle: {
                     border: {
-                      fg: theme.primary.bg,
-                      bg: theme.primary.fg
+                        fg: theme.primary.bg,
+                        bg: theme.primary.fg
                     },
                     bg: theme.primary.bg,
                     fg: theme.primary.fg
@@ -242,7 +246,7 @@ astyle: {
                         if (l.match(/^\+/)) {
                             color = '{black-bg}{green-fg}'
                         }
-                      cnt += depthspacer + color + l + '{/}{/}\n'
+                        cnt += depthspacer + color + l + '{/}{/}\n'
                         if (idx == entryPayload.comment.original_position) {
                             cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
                         }
@@ -274,11 +278,11 @@ astyle: {
                 shadow: true,
                 parent: self.box,
 
-                    style: theme.styles.box,
+                style: theme.styles.box,
                 astyle: {
                     border: {
-                      fg: theme.primary.bg,
-                      bg: theme.primary.fg
+                        fg: theme.primary.bg,
+                        bg: theme.primary.fg
                     },
                     bg: theme.primary.bg,
                     fg: theme.primary.fg
@@ -303,7 +307,7 @@ astyle: {
                     left: 'center',
 
                     style: theme.styles.button,
-                    
+
 
                     top: self.offset - 2,
                     width: 'shrink',
@@ -355,8 +359,8 @@ astyle: {
             'astyle': {
                 'bg': theme.styles.window,
                 'border': {
-                  'fg': theme.accent.fg,
-                  'bg': theme.primary.bg
+                    'fg': theme.accent.fg,
+                    'bg': theme.primary.bg
                 },
                 'fg': theme.primary.fg,
             }

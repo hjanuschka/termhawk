@@ -4,10 +4,11 @@ var blessed = require('blessed')
 var EventEmitter = require('events')
 var fs = require('fs')
 var theme = require("./theme")
+var chalk = require("chalk")
 
 marked.setOptions({
     //  Define custom renderer
-    renderer: new TerminalRenderer()
+    renderer: new TerminalRenderer({codespan: chalk.red, code: chalk.red})
 })
 
 
