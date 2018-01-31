@@ -119,7 +119,7 @@ class IssueView {
                 _replybox.createView()
             })
             self.buttons.push(btn1)
-            self.selectedButton=-1;
+            self.selectedButton=-1
 
 
 
@@ -135,178 +135,178 @@ class IssueView {
         depthspacer = ''
         childs.forEach(function(entryPayload) {
 
-                var cnt = ''
-                if (entryPayload.type == 'event') {
-                    if (['comment_deleted', 'subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
-                        return
-                    }
-                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.event.actor.login + '{/}\n'
-                    cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.event.created_at + '{/}\n'
-                    var handled = false
-                    if (entryPayload.event.event == 'labeled') {
-                        cnt += depthspacer + ' added label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
-                        handled = true
-
-                    }
-                    if (entryPayload.event.event == 'unlabeled') {
-                        cnt += depthspacer + ' removed label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
-                        handled = true
-
-                    }
-
-                    if (entryPayload.event.event == 'closed') {
-                        cnt += depthspacer + '  clossed this! \n'
-                        handled = true
-                    }
-
-                    if (entryPayload.event.event == 'renamed') {
-                        cnt += depthspacer + ' Renamed from: \'' + entryPayload.event.rename.from + '\' \n'
-                        cnt += depthspacer + '           to: \'' + entryPayload.event.rename.to + '\' \n'
-                        handled = true
-                    }
-                    if (entryPayload.event.event == 'merged') {
-                        cnt += depthspacer + ' merged this! \n'
-                        handled = true
-                    }
-                    if (entryPayload.event.event == 'head_ref_deleted') {
-                        cnt += depthspacer + ' PR branch removed \n'
-                        handled = true
-                    }
-                    if (handled === false) {
-                        cnt += depthspacer + ' ' + JSON.stringify(entryPayload.event, null, 2) + '\n'
-                    }
-
-                }
-                if (entryPayload.comment.type == 'issue_comment') {
-
-                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
-                    cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
-                    cnt += depthspacer + '--------------------------------------------------------------------------\n'
-                    cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-
-                }
-                if (entryPayload.comment.type == 'pr_review') {
-
-                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: {underline}' + entryPayload.comment.submitted_at + '{/}\n'
-                    cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
-                    cnt += depthspacer + '--------------------------------------------------------------------------\n'
-
-
-                    //depth = depth + 1
-                    depthspacer = Array(depth).join('\t')
-
-
-                    if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
-                        var diff_lines = entryPayload.comment.diff_hunk.split('\n')
-                        diff_lines.forEach(function(l, idx) {
-                            var color = '{white-fg}'
-                            if (l.match(/^\-/)) {
-                                color = '{red-fg}'
-                            }
-                            if (l.match(/^\+/)) {
-                                color = '{green-fg}'
-                            }
-                            cnt += depthspacer + color + l + '{/}\n'
-                            if (idx == entryPayload.comment.original_position) {
-                                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-                            }
-
-                        })
-                    } else {
-                        cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-                    }
-
-
-                }
-                if (entryPayload.comment.type == 'pr_comment') {
-
-                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
-                    cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
-                    cnt += depthspacer + '--------------------------------------------------------------------------\n'
-                    if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
-                        var diff_lines = entryPayload.comment.diff_hunk.split('\n')
-                        diff_lines.forEach(function(l, idx) {
-                            var color = '{white-fg}'
-                            if (l.match(/^\-/)) {
-                                color = '{red-fg}'
-                            }
-                            if (l.match(/^\+/)) {
-                                color = '{green-fg}'
-                            }
-                            cnt += depthspacer + color + l + '{/}\n'
-                            if (idx == entryPayload.comment.original_position) {
-                                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-                            }
-
-                        })
-                    } else {
-                        cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-                    }
-
-
-                }
-
-
-
-
-                var box2 = blessed.box({
-                    left: (depth * 1) + 1,
-                    width: '100%-' + (depth * 1) + 2,
-                    height: 'shrink',
-                    border: 'line',
-                    padding: {
-                        left: 0,
-                        right: 0
-                    },
-                    tags: true,
-                    shrink: true,
-                    top: self.offset,
-                    content: cnt,
-                    parent: self.box
-                })
-
-                box2.parseContent()
-                if (box2 && box2._clines) {
-                    self.offset += box2._clines.length + 3
-                } else {
-                    //FIXME double renderer?
+            var cnt = ''
+            if (entryPayload.type == 'event') {
+                if (['comment_deleted', 'subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
                     return
                 }
+                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.event.actor.login + '{/}\n'
+                cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.event.created_at + '{/}\n'
+                var handled = false
+                if (entryPayload.event.event == 'labeled') {
+                    cnt += depthspacer + ' added label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
+                    handled = true
 
-
-
-                if (entryPayload.children && entryPayload.children.length > 0) {
-                    //console.error("CHILD", entryPayload)
-                    self.walkComments(depth + 1, entryPayload.children, 0)
-                    var btn1 = blessed.button({
-                        left: 'center',
-                        style: {
-                            bg: 'blue',
-                            focus: {
-                                bg: 'red'
-                            }
-                        },
-
-                        top: self.offset - 2,
-                        width: 'shrink',
-                        height: 1,
-                        tags: true,
-                        content: 'reply',
-                        mouse: true,
-                        keys: true,
-                        parent: self.box
-                    })
-                    btn1.reply_to = entryPayload.children[entryPayload.children.length - 1].comment.id
-                    btn1.on('press', function() {
-                        var _replybox = new ReplyBox(self.root, self.driver, self.payload)
-                        _replybox.setType('pr_review')
-                        _replybox.setReplyTo(this.reply_to)
-                        _replybox.createView()
-                    })
-                    self.buttons.push(btn1)
                 }
+                if (entryPayload.event.event == 'unlabeled') {
+                    cnt += depthspacer + ' removed label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
+                    handled = true
+
+                }
+
+                if (entryPayload.event.event == 'closed') {
+                    cnt += depthspacer + '  clossed this! \n'
+                    handled = true
+                }
+
+                if (entryPayload.event.event == 'renamed') {
+                    cnt += depthspacer + ' Renamed from: \'' + entryPayload.event.rename.from + '\' \n'
+                    cnt += depthspacer + '           to: \'' + entryPayload.event.rename.to + '\' \n'
+                    handled = true
+                }
+                if (entryPayload.event.event == 'merged') {
+                    cnt += depthspacer + ' merged this! \n'
+                    handled = true
+                }
+                if (entryPayload.event.event == 'head_ref_deleted') {
+                    cnt += depthspacer + ' PR branch removed \n'
+                    handled = true
+                }
+                if (handled === false) {
+                    cnt += depthspacer + ' ' + JSON.stringify(entryPayload.event, null, 2) + '\n'
+                }
+
+            }
+            if (entryPayload.comment.type == 'issue_comment') {
+
+                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
+                cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+                cnt += depthspacer + '--------------------------------------------------------------------------\n'
+                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+
+            }
+            if (entryPayload.comment.type == 'pr_review') {
+
+                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: {underline}' + entryPayload.comment.submitted_at + '{/}\n'
+                cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
+                cnt += depthspacer + '--------------------------------------------------------------------------\n'
+
+
+                //depth = depth + 1
+                depthspacer = Array(depth).join('\t')
+
+
+                if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
+                    var diff_lines = entryPayload.comment.diff_hunk.split('\n')
+                    diff_lines.forEach(function(l, idx) {
+                        var color = '{white-fg}'
+                        if (l.match(/^\-/)) {
+                            color = '{red-fg}'
+                        }
+                        if (l.match(/^\+/)) {
+                            color = '{green-fg}'
+                        }
+                        cnt += depthspacer + color + l + '{/}\n'
+                        if (idx == entryPayload.comment.original_position) {
+                            cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                        }
+
+                    })
+                } else {
+                    cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                }
+
+
+            }
+            if (entryPayload.comment.type == 'pr_comment') {
+
+                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
+                cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+                cnt += depthspacer + '--------------------------------------------------------------------------\n'
+                if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
+                    var diff_lines = entryPayload.comment.diff_hunk.split('\n')
+                    diff_lines.forEach(function(l, idx) {
+                        var color = '{white-fg}'
+                        if (l.match(/^\-/)) {
+                            color = '{red-fg}'
+                        }
+                        if (l.match(/^\+/)) {
+                            color = '{green-fg}'
+                        }
+                        cnt += depthspacer + color + l + '{/}\n'
+                        if (idx == entryPayload.comment.original_position) {
+                            cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                        }
+
+                    })
+                } else {
+                    cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                }
+
+
+            }
+
+
+
+
+            var box2 = blessed.box({
+                left: (depth * 1) + 1,
+                width: '100%-' + (depth * 1) + 2,
+                height: 'shrink',
+                border: 'line',
+                padding: {
+                    left: 0,
+                    right: 0
+                },
+                tags: true,
+                shrink: true,
+                top: self.offset,
+                content: cnt,
+                parent: self.box
             })
-            //return cnt
+
+            box2.parseContent()
+            if (box2 && box2._clines) {
+                self.offset += box2._clines.length + 3
+            } else {
+                //FIXME double renderer?
+                return
+            }
+
+
+
+            if (entryPayload.children && entryPayload.children.length > 0) {
+                //console.error("CHILD", entryPayload)
+                self.walkComments(depth + 1, entryPayload.children, 0)
+                var btn1 = blessed.button({
+                    left: 'center',
+                    style: {
+                        bg: 'blue',
+                        focus: {
+                            bg: 'red'
+                        }
+                    },
+
+                    top: self.offset - 2,
+                    width: 'shrink',
+                    height: 1,
+                    tags: true,
+                    content: 'reply',
+                    mouse: true,
+                    keys: true,
+                    parent: self.box
+                })
+                btn1.reply_to = entryPayload.children[entryPayload.children.length - 1].comment.id
+                btn1.on('press', function() {
+                    var _replybox = new ReplyBox(self.root, self.driver, self.payload)
+                    _replybox.setType('pr_review')
+                    _replybox.setReplyTo(this.reply_to)
+                    _replybox.createView()
+                })
+                self.buttons.push(btn1)
+            }
+        })
+        //return cnt
 
     }
     createView() {
@@ -503,7 +503,7 @@ class IssueView {
                     self.selectedButton = 0
                 }
                 self.buttons[self.selectedButton].focus()
-                self.root.screen.render();
+                self.root.screen.render()
             }
         })
     }
