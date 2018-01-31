@@ -13,6 +13,12 @@ class ReplyBox extends EventEmitter {
         this.payload = payload
         this.driver = driver
     }
+    setType(type) {
+        this.type = type
+    }
+    setReplyTo(id) {
+        this.reply_to = id
+    }
     createView() {
         var self = this
         self.form = blessed.form({
@@ -30,9 +36,16 @@ class ReplyBox extends EventEmitter {
             scrollable: true,
         })
         self.form.on('submit', function(data) {
-            self.driver.createIssueComment(self.payload.repo, self.payload.id, {
+            var method = 'createIssueComment'
+            var reply_payload = {
                 body: data.text
-            }).then(result => {
+            }
+            if(self.type == 'pr_review') {
+                method = 'createPullCommentReply'
+                reply_payload.in_reply_to = self.reply_to
+            }
+            self.driver[method](self.payload.repo, self.payload.id,reply_payload
+            ).then(result => {
                 self.emit('hawk_done')
                 self.root.remove(self.form)
                 self.root.screen.render()

@@ -16,13 +16,24 @@ class GithubDriver {
     merge(repo, id) {
 
         var a = repo.split("/");
-				//FIXME merge method, msg and so on
+        //FIXME merge method, msg and so on
         return octokit.pullRequests.merge({
             owner: a[0],
             repo: a[1],
             number: id
         })
         var a = repo.split("/");
+    }
+    createPullCommentReply(repo, id, payload) {
+        var a = repo.split("/");
+        return octokit.pullRequests.createCommentReply({
+            owner: a[0],
+            repo: a[1],
+            number: id,
+            body: payload.body,
+            in_reply_to: payload.in_reply_to
+        });
+
     }
     createIssueComment(repo, id, payload) {
 
