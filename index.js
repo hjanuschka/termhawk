@@ -3,6 +3,7 @@ var notificationView = require('./notificationview.js')
 var BottomBar = require('./bottombar.js')
 var gitDriver = require('./github')
 var issueView = require('./issueview')
+var MDBox = require('./mdbox')
 
 // Create a screen object.
 var screen = blessed.screen({
@@ -82,6 +83,24 @@ screen.key([
 ], function(ch, key) {
     return process.exit(0)
 })
+
+
+screen.key([
+    'S-a'
+], function(ch, key) {
+    var _MDBox = new MDBox(screen, driver, './about.md')
+    _MDBox.createView()
+})
+
+screen.key([
+    'S-h'
+], function(ch, key) {
+    var _MDBox = new MDBox(screen, driver, './help.md')
+    _MDBox.createView()
+})
+
+
+
 
 // Focus our element.
 box.focus()
