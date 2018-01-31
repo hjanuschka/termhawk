@@ -20,7 +20,7 @@ class DiffBox {
 
 
         ]
-        var diffBox = blessed.listtable({
+        var diffBox = blessed.box({
             'parent': self.root,
             'border': 'line',
             'scrollable': true,
@@ -76,7 +76,7 @@ class DiffBox {
                 return res.text()
             })
             .then(function(diff_in) {
-                var diff = [['Lines']]
+                var diff = []
                 diff_in.split('\n').forEach(function(l) {
                     var color = '{white-fg}'
                     if (l.match(/^\-/)) {
@@ -85,10 +85,10 @@ class DiffBox {
                     if (l.match(/^\+/)) {
                         color = '{green-fg}'
                     }
-                    diff.push([color + l + '{/}'])
+                    diff.push(color + l + '{/}')
 
                 })
-                diffBox.setData(diff)
+                diffBox.setContent(diff.join("\n"))
                 self.root.screen.render()
 
 

@@ -11,10 +11,11 @@ var screen = blessed.screen({
     'smartCSR': true,
     autoPadding: false,
     fullUnicode: true,
+    terminal: 'xterm-256color',
     debug: true,
-  style: {
-    bg: theme.primary.bg
-  },
+    style: {
+        bg: theme.primary.bg
+    },
     warnings: true
 })
 
@@ -27,7 +28,10 @@ var driver = new gitDriver()
 
 
 if (process.env.issue_test) {
-    var issue_view = new issueView(screen, driver, {repo: 'hjanuschka/termhawk', id:1})
+    var issue_view = new issueView(screen, driver, {
+        repo: 'hjanuschka/termhawk',
+        id: 1
+    })
     issue_view.createView()
     issue_view.focus()
 } else {
@@ -51,10 +55,9 @@ screen.key(['e'], function(ch, key) {
     notify_view.remove()
 })
 screen.key([
-    'w'
-], function(ch, key) {
-})
-// Quit on Escape, q, or Control-C.
+        'w'
+    ], function(ch, key) {})
+    // Quit on Escape, q, or Control-C.
 screen.key([
     'escape',
     'q',
