@@ -31,6 +31,8 @@ var Theme = {
             label: {
                 fg: 'red',
                 bg: 'lightgrey'
+            },
+            cell: {
             }
 
         },
@@ -45,6 +47,15 @@ var Theme = {
             label: {
                 fg: 'red',
                 bg: 'lightgrey'
+            },
+            cell: {
+                bg: 'lightgrey',
+                fg: 'black',
+                selected: {
+                    bg: 'red',
+                    fg: 'white'
+                }
+
             }
         },
     }
