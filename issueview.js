@@ -119,7 +119,7 @@ class IssueView {
                 _replybox.createView()
             })
             self.buttons.push(btn1)
-
+            self.selectedButton=-1;
 
 
 
