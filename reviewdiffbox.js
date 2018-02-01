@@ -84,16 +84,17 @@ class ReviewDiffBox extends EventEmitter {
     createView() {
         var self = this
         self.box = blessed.list({
-            height: '100%-3',
+            height: '100%',
             padding: 1,
             tags: true,
             border: 'line',
-            width: '100%-3',
+            width: '100%',
             parent: self.root,
             keys: true,
             //width: '80%',
             vi: true,
             mouse: true,
+						label: "Code Review",
             style: theme.styles.box
         })
 
