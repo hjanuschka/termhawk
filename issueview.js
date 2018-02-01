@@ -145,11 +145,14 @@ class IssueView {
         self.box.focus()
         this.box.screen.render()
     }
-    walkComments(depth = 0, childs, pointZero = 0) {
+    walkComments(depth = 0, childs, pointZero = 0, lastReviewId = false) {
         var self = this
 
         var depthspacer = Array(depth).join('\t')
         depthspacer = ''
+        if (!lastReviewId) {
+            lastReviewId = 0
+        }
         childs.forEach(function(entryPayload) {
 
             var cnt = ''
@@ -207,8 +210,8 @@ class IssueView {
 
             }
             if (entryPayload.comment.type == 'pr_review') {
-
-                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: {underline}' + entryPayload.comment.submitted_at + '{/}\n'
+                lastReviewId = entryPayload.comment.id
+                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: ' + entryPayload.comment.id + ' {underline}' + entryPayload.comment.submitted_at + '{/}\n'
                 cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
                 cnt += depthspacer + '--------------------------------------------------------------------------\n'
 
@@ -262,7 +265,7 @@ class IssueView {
                         }
 
                     })
-                    if(!added_it) {
+                    if (!added_it) {
                         cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
                     }
                 } else {
@@ -315,31 +318,34 @@ class IssueView {
 
             if (entryPayload.children && entryPayload.children.length > 0) {
                 //console.error("CHILD", entryPayload)
-                self.walkComments(depth + 1, entryPayload.children, 0)
-                var btn1 = blessed.button({
-                    left: 'center',
-
-                    style: theme.styles.button,
-
-
-                    top: self.offset - 3,
-                    width: 'shrink',
-                    height: 1,
-                    tags: true,
-                    content: 'reply',
-                    mouse: true,
-                    keys: true,
-                    parent: self.box
-                })
-                btn1.reply_to = entryPayload.children[entryPayload.children.length - 1].comment.id
-                btn1.on('press', function() {
-                    var _replybox = new ReplyBox(self.root, self.driver, self.payload)
-                    _replybox.setType('pr_review')
-                    _replybox.setReplyTo(this.reply_to)
-                    _replybox.createView()
-                })
-                self.buttons.push(btn1)
+                lastReviewId = entryPayload.children[entryPayload.children.length - 1].comment.id
+                self.walkComments(depth + 1, entryPayload.children, 0, lastReviewId)
             }
+            var btn1 = blessed.button({
+                left: 'center',
+
+                style: theme.styles.button,
+
+
+                top: self.offset - 3,
+                width: 'shrink',
+                height: 1,
+                tags: true,
+                content: 'reply',
+                mouse: true,
+                keys: true,
+                parent: self.box
+            })
+            //btn1.reply_to = entryPayload.children[entryPayload.children.length - 1].comment.id
+            btn1.reply_to = lastReviewId
+
+            btn1.on('press', function() {
+                var _replybox = new ReplyBox(self.root, self.driver, self.payload)
+                _replybox.setType('pr_review')
+                _replybox.setReplyTo(this.reply_to)
+                _replybox.createView()
+            })
+            self.buttons.push(btn1)
         })
         //return cnt
 
@@ -502,6 +508,7 @@ class IssueView {
         })
         this.box.key(['S-v'], function() {
             var _reviewbox = new ReviewBox(self.root, self.driver, self.payload)
+            _reviewbox.setDiffUrl(self.state.issue.diff_url)
             _reviewbox.createView()
             _reviewbox.on('hawk_done', function() {
                 //Fixme scroll to end

@@ -17,17 +17,20 @@ class ReviewDiffBox extends EventEmitter {
         this.reviews = {}
     }
     removeMe() {
-        var self = this;
-        self.root.remove(self.box);
+        var self = this
+        self.root.remove(self.box)
     }
     setDiff(diff) {
         var self = this
         self.lines = diff.split('\n')
 
     }
+    setReviews(re) {
+        this.reviews = re
+    }
     diffPosition(lines, offset) {
         var line_to_find = lines[offset]
-            //Loop Up to Find diff
+        //Loop Up to Find diff
         var i = 0
         var pathname = ''
         var file_start = 0
@@ -94,20 +97,17 @@ class ReviewDiffBox extends EventEmitter {
             //width: '80%',
             vi: true,
             mouse: true,
-						label: "Code Review",
+            label: 'Code Review',
             style: theme.styles.box
         })
 
-        self.box.key(['h'], function() {
-            self.removeMe();
+
+        self.box.key(['h', 's'], function() {
+            self.emit('review_done', self.reviews)
+            self.removeMe()
         })
 
 
-        self.box.key(['s'], function() {
-            //FIXME ID - store to github
-            //get other fields
-            console.log(self.reviews)
-        })
         self.box.key(['d'], function() {
             delete self.reviews[self.box.selected]
             self.reRenderDiff(self.box.selected)
@@ -137,8 +137,8 @@ class ReviewDiffBox extends EventEmitter {
             _replybox.createView()
         })
         self.reRenderDiff()
-        self.box.focus();
-        self.root.render();
+        self.box.focus()
+        self.root.render()
 
 
     }

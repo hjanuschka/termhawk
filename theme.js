@@ -20,6 +20,14 @@ var Theme = {
                 fg: 'yellow'
             }
         },
+        radioset: {
+            bg: 'blue',
+            fg: 'white'
+        },
+        radiobutton: {
+            fg: 'white',
+            bg: 'blue'
+        },
         window: {
             shadow: 'red',
             bg: 'blue',
@@ -32,8 +40,7 @@ var Theme = {
                 fg: 'red',
                 bg: 'lightgrey'
             },
-            cell: {
-            }
+            cell: {}
 
         },
         box: {
@@ -48,6 +55,12 @@ var Theme = {
                 fg: 'red',
                 bg: 'lightgrey'
             },
+            selected: {
+                bg: 'red',
+                fg: 'white'
+            },
+
+
             cell: {
                 bg: 'lightgrey',
                 fg: 'black',

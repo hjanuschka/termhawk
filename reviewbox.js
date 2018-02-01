@@ -2,6 +2,8 @@ var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var EventEmitter = require('events')
+
+var fetch = require('node-fetch')
 var theme = require('./theme')
 var fs = require('fs')
 
@@ -15,9 +17,13 @@ class ReviewBox extends EventEmitter {
         this.root = root
         this.payload = payload
         this.driver = driver
+        this.reviews = {}
     }
     setType(type) {
         this.type = type
+    }
+    setDiffUrl(diff) {
+        this.diffUrl = diff
     }
     setReplyTo(id) {
         this.reply_to = id
@@ -41,7 +47,22 @@ class ReviewBox extends EventEmitter {
             style: theme.styles.box
         })
         self.form.on('submit', function(data) {
-            console.log(data)
+            var state = 'PENDING'
+            if (data.REQUEST_CHANGES) {
+                state = 'REQUEST_CHANGES'
+            }
+            if (data.APPROVE) {
+                state = 'APPROVE'
+            }
+            if (data.COMMENT) {
+                state = 'COMMENT'
+            }
+            //console.log(data, self.reviews)
+            self.driver.createPRReview(self.payload.repo, self.payload.id, {text: data.text,state: state, reviews: self.reviews})
+                .then(function() {
+                    self.root.remove(self.form)
+                    self.root.screen.render()
+                })
         })
 
         var set = blessed.radioset({
@@ -52,9 +73,7 @@ class ReviewBox extends EventEmitter {
             shrink: true,
             //padding: 1,
             //content: 'f',
-            style: {
-                bg: 'magenta'
-            }
+            style: theme.styles.radioset
         })
 
         var radio1 = blessed.radiobutton({
@@ -62,9 +81,7 @@ class ReviewBox extends EventEmitter {
             mouse: true,
             keys: true,
             shrink: false,
-            style: {
-                bg: 'magenta'
-            },
+            style: theme.styles.radiobutton,
             height: 1,
             left: 0,
             top: 0,
@@ -77,9 +94,7 @@ class ReviewBox extends EventEmitter {
             mouse: true,
             keys: true,
             shrink: true,
-            style: {
-                bg: 'magenta'
-            },
+            style: theme.styles.radiobutton,
             height: 1,
             left: 0,
             top: 1,
@@ -91,9 +106,7 @@ class ReviewBox extends EventEmitter {
             mouse: true,
             keys: true,
             shrink: true,
-            style: {
-                bg: 'magenta'
-            },
+            style: theme.styles.radiobutton,
             height: 1,
             left: 0,
             top: 2,
@@ -123,10 +136,6 @@ class ReviewBox extends EventEmitter {
         })
 
 
-        //var diffViewer = new ReviewDiffBox(self.form, self.driver, {})
-        //var diff_data = fs.readFileSync('./demo.diff', 'utf8')
-        //diffViewer.setDiff(diff_data.toString())
-        //diffViewer.createView()
 
         self.form.focus()
         var cr = blessed.button({
@@ -172,13 +181,36 @@ class ReviewBox extends EventEmitter {
             }
         })
 
+        var commentCount = blessed.text({
+            parent: self.form,
+            padding: {
+                left: 1,
+                right: 1
+            },
+            left: 24,
+            top: 18,
+            style: theme.styles.box,
+            content: 'Comments in stash: ' + Object.keys(self.reviews).length,
+        })
+
         cr.on('press', function() {
             var diffViewer = new ReviewDiffBox(self.root, self.driver, {})
-            var diff_data = fs.readFileSync('./demo.diff', 'utf8')
-            diffViewer.setDiff(diff_data.toString())
-            diffViewer.createView()
-            //FIXME load diff,
-            //add event once window is closed
+            fetch(self.diffUrl)
+                .then(function(res) {
+                    return res.text()
+                })
+                .then(function(diff_in) {
+                    diffViewer.setReviews(self.reviews)
+                    diffViewer.setDiff(diff_in)
+                    diffViewer.createView()
+                })
+
+
+
+            diffViewer.on('review_done', function(data) {
+                self.reviews = data
+                commentCount.setContent('Comments in stash: ' + Object.keys(self.reviews).length)
+            })
             // set already set reviews before showing
         })
         submit.on('press', function() {

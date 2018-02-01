@@ -24,6 +24,28 @@ class GithubDriver {
         })
         var a = repo.split("/");
     }
+    createPRReview(repo, id, payload) {
+
+        var a = repo.split("/");
+        var comments = []
+        for (var key in payload.reviews) {
+            comments.push({
+                path: payload.reviews[key].payload.pathname,
+                position: payload.reviews[key].payload.nr,
+                body: payload.reviews[key].comment,
+            })
+        }
+      //console.log(comments)
+        return octokit.pullRequests.createReview({
+            owner: a[0],
+            repo: a[1],
+            number: id,
+            body: payload.text,
+            event: payload.state,
+            comments: comments
+        })
+
+    }
     createPullCommentReply(repo, id, payload) {
         var a = repo.split("/");
         return octokit.pullRequests.createCommentReply({
@@ -32,7 +54,7 @@ class GithubDriver {
             number: id,
             body: payload.body,
             in_reply_to: payload.in_reply_to
-        });
+        }).catch(function(e) {console.log(e)});
 
     }
     createIssueComment(repo, id, payload) {

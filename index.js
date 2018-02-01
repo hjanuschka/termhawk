@@ -30,7 +30,7 @@ var driver = new gitDriver()
 if (process.env.issue_test) {
     var issue_view = new issueView(screen, driver, {
         repo: 'hjanuschka/termhawk',
-        id: 1
+        id: 3
     })
     issue_view.createView()
     issue_view.focus()
