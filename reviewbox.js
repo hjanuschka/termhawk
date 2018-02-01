@@ -177,6 +177,9 @@ class ReviewBox extends EventEmitter {
             var diff_data = fs.readFileSync('./demo.diff', 'utf8')
             diffViewer.setDiff(diff_data.toString())
             diffViewer.createView()
+            //FIXME load diff,
+            //add event once window is closed
+            // set already set reviews before showing
         })
         submit.on('press', function() {
             self.form.submit()
