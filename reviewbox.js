@@ -3,7 +3,9 @@ var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var EventEmitter = require('events')
 var theme = require('./theme')
+var fs = require('fs')
 
+var ReviewDiffBox = require('./reviewdiffbox')
 
 class ReviewBox extends EventEmitter {
 
@@ -46,7 +48,7 @@ class ReviewBox extends EventEmitter {
             parent: self.form,
             left: 2,
             top: 1,
-            width: "40%",
+            width: '40%',
             shrink: true,
             //padding: 1,
             //content: 'f',
@@ -120,42 +122,74 @@ class ReviewBox extends EventEmitter {
             text.readInput()
         })
 
+
+        //var diffViewer = new ReviewDiffBox(self.form, self.driver, {})
+        //var diff_data = fs.readFileSync('./demo.diff', 'utf8')
+        //diffViewer.setDiff(diff_data.toString())
+        //diffViewer.createView()
+
         self.form.focus()
-            /*
-                    var submit = blessed.button({
-                        parent: self.form,
-                        mouse: true,
-                        keys: true,
-                        shrink: true,
-                        padding: {
-                            left: 1,
-                            right: 1
-                        },
-                        left: 'center',
-                        top: 20,
-                        name: 'submit',
-                        content: 'submit',
-                        style: {
-                            bg: 'blue',
-                            focus: {
-                                bg: 'red'
-                            }
-                        }
-                    })
+        var cr = blessed.button({
+            parent: self.form,
+            mouse: true,
+            keys: true,
+            shrink: true,
+            padding: {
+                left: 1,
+                right: 1
+            },
+            left: 10,
+            top: 20,
+            name: 'code review',
+            content: 'code review',
+            style: {
+                bg: 'blue',
+                focus: {
+                    bg: 'red'
+                }
+            }
+        })
 
-                    submit.on('press', function() {
-                        self.form.submit()
-                    })
 
-                    text.on('focus', function() {
-                        text.readInput()
-                    })
+        var submit = blessed.button({
+            parent: self.form,
+            mouse: true,
+            keys: true,
+            shrink: true,
+            padding: {
+                left: 1,
+                right: 1
+            },
+            left: 24,
+            top: 20,
+            name: 'submit',
+            content: 'submit',
+            style: {
+                bg: 'blue',
+                focus: {
+                    bg: 'red'
+                }
+            }
+        })
 
-                    text.key('C-e', function() {
-                        //text.readEditor(function(err, data) {})
-                    })
+        cr.on('press', function() {
+            var diffViewer = new ReviewDiffBox(self.root, self.driver, {})
+            var diff_data = fs.readFileSync('./demo.diff', 'utf8')
+            diffViewer.setDiff(diff_data.toString())
+            diffViewer.createView()
+        })
+        submit.on('press', function() {
+            self.form.submit()
+        })
 
-            */
+        text.on('focus', function() {
+            text.readInput()
+        })
+
+        text.key('C-e', function() {
+            //text.readEditor(function(err, data) {})
+        })
+
         self.form.key(['h'], function() {
             self.root.remove(self.form)
             self.root.screen.render()
