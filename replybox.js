@@ -2,7 +2,7 @@ var marked = require('marked')
 var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var EventEmitter = require('events')
-var theme = require("./theme")
+var theme = require('./theme')
 
 
 class ReplyBox extends EventEmitter {
@@ -17,8 +17,19 @@ class ReplyBox extends EventEmitter {
     setType(type) {
         this.type = type
     }
+    setPrefilledValue(v) {
+        this.preFilledValue = v
+    }
+    setCustomSubmit(fn) {
+        this.submit = fn
+    }
     setReplyTo(id) {
         this.reply_to = id
+    }
+    removeMe() {
+        var self = this
+        self.root.remove(self.form)
+        self.root.screen.render()
     }
     createView() {
         var self = this
@@ -39,16 +50,19 @@ class ReplyBox extends EventEmitter {
             style: theme.styles.box
         })
         self.form.on('submit', function(data) {
+            if (self.submit) {
+                self.submit(data)
+                return
+            }
             var method = 'createIssueComment'
             var reply_payload = {
                 body: data.text
             }
-            if(self.type == 'pr_review') {
+            if (self.type == 'pr_review') {
                 method = 'createPullCommentReply'
                 reply_payload.in_reply_to = self.reply_to
             }
-            self.driver[method](self.payload.repo, self.payload.id,reply_payload
-            ).then(result => {
+            self.driver[method](self.payload.repo, self.payload.id, reply_payload).then(result => {
                 self.emit('hawk_done')
                 self.root.remove(self.form)
                 self.root.screen.render()
@@ -68,6 +82,10 @@ class ReplyBox extends EventEmitter {
             top: 3,
             name: 'text'
         })
+        if (self.preFilledValue) {
+            console.log(self.preFilledValue)
+            text.setValue(self.preFilledValue)
+        }
 
         var submit = blessed.button({
             parent: self.form,
@@ -102,10 +120,10 @@ class ReplyBox extends EventEmitter {
             //text.readEditor(function(err, data) {})
         })
 
-      self.form.key(["h"], function() {
-          self.root.remove(self.form);
-          self.root.screen.render();
-      })
+        self.form.key(['h'], function() {
+            self.root.remove(self.form)
+            self.root.screen.render()
+        })
         self.root.screen.render()
 
     }

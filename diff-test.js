@@ -1,5 +1,6 @@
 var Blessed = require('blessed')
 var DiffComment = require('./diff-comment')
+var ReplyBox = require('./replybox')
 var fs = require('fs')
 
 var screen = Blessed.screen({
@@ -13,7 +14,7 @@ var d = Blessed.list({
     padding: 1,
     tags: true,
     border: 'line',
-    width: '40%',
+    width: '80%',
     parent: screen,
     keys: true,
     //width: '80%',
@@ -72,16 +73,63 @@ function diffPosition(lines, offset) {
 
 }
 
+function reRenderDiff(in_idx) {
+    var color = ''
+    d.clearItems()
+    lines.forEach(function(l, idx) {
+        if (reviews[idx]) {
+            color = '{#ffa500-bg}{black-fg} '
+
+        }
+        d.addItem(color + l + '{/}')
+        color = ''
+    })
+
+    d.select(in_idx)
+    d.focus()
+    screen.render()
+}
+
 var diff_data = fs.readFileSync('./demo.diff', 'utf8')
 //d.setDiff(diff_data.toString())
 var lines = diff_data.toString().split('\n')
+var reviews = {}
 lines.forEach(function(l) {
     d.addItem(l)
 })
 d.focus()
+d.key(['s'], function() {
+    //FIXME ID - store to github
+    //get other fields
+    console.log(reviews)
+})
+d.key(['d'], function() {
+    delete reviews[d.selected]
+    reRenderDiff(d.selected)
+})
 d.on('select', function(item, idx) {
     var found = diffPosition(lines, idx)
-    console.log(found)
+    var _replybox = new ReplyBox(screen, null, {
+        id: 'Review'
+    })
+    if (reviews[idx]) {
+
+        _replybox.setPrefilledValue(reviews[idx].comment)
+
+    }
+
+    _replybox.setCustomSubmit(function(data) {
+
+        reviews[idx] = {
+            payload: found,
+            comment: data.text
+        }
+
+        _replybox.removeMe()
+        reRenderDiff(idx)
+
+    })
+    _replybox.createView()
 })
 
 screen.key('q', function() {
