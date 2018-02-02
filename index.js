@@ -82,6 +82,11 @@ screen.key([
 })
 
 
+screen.key('S-d', screen.debugLog.toggle);
+
+var a = [1,2,3]
+  screen.debug("log")
+  screen.debug(a)
 
 
 

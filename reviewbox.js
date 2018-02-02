@@ -194,6 +194,7 @@ class ReviewBox extends EventEmitter {
         })
 
         cr.on('press', function() {
+            self.root.screen.debug("PRESS")
             var diffViewer = new ReviewDiffBox(self.root, self.driver, {})
             fetch(self.diffUrl)
                 .then(function(res) {
