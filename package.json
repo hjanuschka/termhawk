@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/rest": "^14.0.7",
-    "blessed": "^0.1.81",
+    "blessed": "Dwood15/blessed",
     "blessed-contrib": "^4.8.5",
     "marked": "^0.3.12",
     "marked-terminal": "^2.0.0",

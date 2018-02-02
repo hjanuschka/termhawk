@@ -103,6 +103,10 @@ blessed-contrib@^4.8.5:
     term-canvas "0.0.5"
     x256 ">=0.0.1"
 
+blessed@Dwood15/blessed:
+  version "0.1.81"
+  resolved "https://codeload.github.com/Dwood15/blessed/tar.gz/e53d55c7aebc69a6424aeef149fa8941d7e6cf12"
+
 blessed@^0.1.81:
   version "0.1.81"
   resolved "https://registry.yarnpkg.com/blessed/-/blessed-0.1.81.tgz#f962d687ec2c369570ae71af843256e6d0ca1129"

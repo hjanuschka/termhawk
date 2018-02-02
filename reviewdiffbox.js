@@ -19,6 +19,7 @@ class ReviewDiffBox extends EventEmitter {
     removeMe() {
         var self = this
         self.root.remove(self.box)
+        self.root.screen.render()
     }
     setDiff(diff) {
         var self = this
