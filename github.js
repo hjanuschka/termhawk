@@ -367,9 +367,10 @@ class GithubDriver {
     }
     async paginate(method, def = {}) {
         var opts = Object.assign({
-            per_page: 300
+            per_page: 100
         }, def);
         let response = await method(opts);
+
         let {
             data
         } = response
