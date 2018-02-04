@@ -3,8 +3,8 @@
 
 
 "@octokit/rest@^14.0.7":
-  version "14.0.7"
-  resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-14.0.7.tgz#fef887a79c59c9add0ce66491ab8a990f2462681"
+  version "14.0.8"
+  resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-14.0.8.tgz#594292f9c30eb86a832f99f7d464ee7c9c8114c5"
   dependencies:
     before-after-hook "^1.1.0"
     debug "^3.1.0"
@@ -106,10 +106,6 @@ blessed-contrib@^4.8.5:
 blessed@Dwood15/blessed:
   version "0.1.81"
   resolved "https://codeload.github.com/Dwood15/blessed/tar.gz/e53d55c7aebc69a6424aeef149fa8941d7e6cf12"
-
-blessed@^0.1.81:
-  version "0.1.81"
-  resolved "https://registry.yarnpkg.com/blessed/-/blessed-0.1.81.tgz#f962d687ec2c369570ae71af843256e6d0ca1129"
 
 boom@4.x.x:
   version "4.3.1"
@@ -405,8 +401,8 @@ lodash.toarray@^4.4.0:
   resolved "https://registry.yarnpkg.com/lodash.toarray/-/lodash.toarray-4.4.0.tgz#24c4bfcd6b2fba38bfd0594db1179d8e9b656561"
 
 lodash@>=3.0.0, lodash@^4.17.4:
-  version "4.17.4"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+  version "4.17.5"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
 
 map-canvas@>=0.1.5:
   version "0.1.5"
