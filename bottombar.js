@@ -1,4 +1,5 @@
 var blessed = require('blessed')
+var theme = require('./theme')
 
 class BottomBar {
     constructor(root) {
@@ -11,60 +12,32 @@ class BottomBar {
     reRender() {
         this.view.screen.render()
     }
+    setStatus(t) {
+      if(!this.view) return;
+      this.view.setContent(t);
+      this.view.screen.render();
+    }
     createView() {
         var self = this
-        this.view = blessed.listbar({
+        this.view = blessed.box({
             parent: this.root,
             bottom: 0,
             left: 0,
             right: 0,
-            height:  3,
-            mouse: true,
-            keys: true,
+            padding: {
+                top: 0
+            },
+            height:  1,
             autoCommandKeys: true,
-            border: 'bg',
+            border: 0,
             padding: 0,
             vi: true,
+            tags: true,
+            content: 'Home',
             style: {
-                item: {
-                    bg: 'magenta',
-                    fg: 'white'
-                    //focus: {asd asda
-                    //  bg: 'blue'
-                    //}
-                },
-                selected: {
-                    bg: 'blue'
-                }
+                bg: 'red',
+                fg: 'white',
             },
-            commands: {
-                'notifications': {
-                    keys: ['n'],
-                    callback: function() {
-                        self.reRender()
-                    }
-                },
-                'search': {
-                    keys: ['s'],
-                    callback: function() {
-                        self.reRender()
-                    }},
-                'search': {
-                    keys: ['s'],
-                    callback: function() {
-                        self.reRender()
-                    }},
-                'favorites': {
-                    keys: ['f'],
-                    callback: function() {
-                        self.reRender()
-                    }},
-                'settings': {
-                    keys: ['f'],
-                    callback: function() {
-                        self.reRender()
-                    }},
-            }
         })
         this.events()
 
