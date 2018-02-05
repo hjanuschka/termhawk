@@ -387,13 +387,19 @@ class GithubDriver {
                 var transformed = []
                 notifications.forEach(function(noti) {
                     var matches = noti.subject.url.match(/.*\/([0-9]+$)/)
+                  if(matches) {
                     transformed.push({
                         id: noti.id,
                         title: noti.subject.title,
                         repo: noti.repository.full_name,
                         target_id: matches[1]
                     })
-                })
+
+                  } else {
+                    //WOOT
+                  }
+                }
+                )
                 return Promise.resolve(transformed);
 
             });
