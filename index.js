@@ -4,8 +4,8 @@ var BottomBar = require('./bottombar.js')
 var gitDriver = require('./github')
 var issueView = require('./issueview')
 var MDBox = require('./mdbox')
-var theme = require("./theme")
-var SearchBox = require("./searchbox")
+var theme = require('./theme')
+var SearchBox = require('./searchbox')
 
 // Create a screen object.
 var screen = blessed.screen({
@@ -15,18 +15,42 @@ var screen = blessed.screen({
     terminal: 'xterm-256color',
     debug: true,
     style: {
-        bg: "blue"
+        bg: 'blue'
     },
     warnings: true
 })
+Array.prototype.last = function() {
+    return this[this.length - 1]
+}
+
 var bottom_bar = new BottomBar(screen)
 screen.hawk = {
-  setStatus: function(t) {
-    bottom_bar.setStatus(t); 
-  },
-  front: function() {
-    bottom_bar.view.setFront()
-  }
+    history: [],
+    screen: screen,
+    setStatus: function(t) {
+        bottom_bar.setStatus(t)
+    },
+    front: function() {
+        bottom_bar.view.setFront()
+    },
+    addHistory: function(el) {
+        this.history.push(el)
+    },
+    goBack: function() {
+        screen.debug("GO BACK")
+        var popped = this.history.pop()
+        //Remove top element
+        this.screen.remove(popped)
+        //focus prev.
+        var el = this.history.last()
+        screen.render()
+        setTimeout(() => {
+            el.focus()
+        })
+
+    }
+
+
 }
 
 
@@ -45,7 +69,6 @@ if (process.env.issue_test) {
         id: 1
     })
     issue_view.createView()
-    issue_view.focus()
 } else {
 
     var notify_view = new notificationView(screen, driver)
@@ -67,9 +90,9 @@ screen.key(['e'], function(ch, key) {
     notify_view.remove()
 })
 screen.key([
-        'w'
-    ], function(ch, key) {})
-    // Quit on Escape, q, or Control-C.
+    'w'
+], function(ch, key) {})
+// Quit on Escape, q, or Control-C.
 screen.key([
     'escape',
     'q',
@@ -102,12 +125,16 @@ screen.key([
     _MDBox.createView()
 })
 
+screen.key(['h'], function() {
+    screen.hawk.goBack()
+    screen.debug(screen.hawk.history.length)
+})
 
-screen.key('S-d', screen.debugLog.toggle);
+screen.key('S-d', screen.debugLog.toggle)
 
-var a = [1,2,3]
-  screen.debug("log")
-  screen.debug(a)
+var a = [1, 2, 3]
+screen.debug('log')
+screen.debug(a)
 
 
 

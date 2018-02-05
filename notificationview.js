@@ -59,6 +59,7 @@ class NotificationView {
 
     }
     createTable() {
+        var self = this
         this.table = blessed.listtable({
             'parent': this.root,
             'data': [
@@ -77,6 +78,7 @@ class NotificationView {
         })
         this.events()
         this.loadData()
+        self.root.screen.hawk.addHistory(self.table)
 
 
     }
@@ -125,12 +127,7 @@ class NotificationView {
             })
             issue.createView()
             issue.focus()
-            issue.box.on('reparent', function() {
-                setTimeout(() => {
-                    self.root.screen.debug('REFOCUS notifications')
-                    self.table.focus()
-                }, 0)
-            })
+            
         })
 
     }
