@@ -44,15 +44,17 @@ class NotificationView {
     loadData() {
         var self = this
         self.driver.getNotifications({
-                all: false,
-                page: 1,
-                per_page: 100
-            })
+            all: false,
+            page: 1,
+            per_page: 100
+        })
             .then(function(notifications) {
                 self.setState({
                     notifications: notifications,
                     storeIndex: false
                 })
+
+                self.root.screen.hawk.setStatus('Notifications')
             })
 
     }
@@ -68,13 +70,14 @@ class NotificationView {
             'vi': true,
             'align': 'left',
             'wrap': true,
-            'height': '100%-3',
+            'height': '100%-1',
             'mouse': true,
-            'width': '100%-3',
+            'width': '100%',
             'style': theme.styles.box
         })
         this.events()
         this.loadData()
+
 
     }
     remove() {
@@ -112,10 +115,10 @@ class NotificationView {
             var not = self.state.notifications[index - 1]
 
             var id = not.target_id
-                //not.repo ='hjanuschka/termhawk'
-                //id=1;
-                //not.repo = 'fastlane/fastlane'
-                //id=11418
+            //not.repo ='hjanuschka/termhawk'
+            //id=1;
+            //not.repo = 'fastlane/fastlane'
+            //id=11418
             var issue = new IssueView(self.root, self.driver, {
                 repo: not.repo,
                 id: id

@@ -18,6 +18,12 @@ var screen = blessed.screen({
     },
     warnings: true
 })
+var bottom_bar = new BottomBar(screen)
+screen.hawk = {
+  setStatus: function(t) {
+    bottom_bar.setStatus(t); 
+  }
+}
 
 
 screen.title = 'TermHawk'
@@ -42,7 +48,7 @@ if (process.env.issue_test) {
 
 }
 
-var bottom_bar = new BottomBar(screen)
+
 bottom_bar.createView()
 
 

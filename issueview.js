@@ -43,8 +43,10 @@ class IssueView {
     reRender() {
         var self = this
 
+
         if (self.state.issue) {
 
+        self.root.screen.hawk.setStatus('Issue: ' + this.state.issue.title)
             var kind = 'Issue'
             var pr_info = ''
             if (this.state.issue.is_pr) {
@@ -370,7 +372,7 @@ class IssueView {
             'input': true,
             'keys': true,
             'content': 'Loading....',
-            'height': '100%-3',
+            'height': '100%-1',
             'width': '100%',
             'top': 0,
             'left': 0,
