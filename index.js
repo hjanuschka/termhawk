@@ -5,6 +5,7 @@ var gitDriver = require('./github')
 var issueView = require('./issueview')
 var MDBox = require('./mdbox')
 var theme = require("./theme")
+var SearchBox = require("./searchbox")
 
 // Create a screen object.
 var screen = blessed.screen({
@@ -84,6 +85,15 @@ screen.key([
     var _MDBox = new MDBox(screen, driver, './about.md')
     _MDBox.createView()
 })
+
+screen.key([
+    'C-s'
+], function(ch, key) {
+    var _searchBox = new SearchBox(screen, driver)
+    _searchBox.createView()
+})
+
+
 
 screen.key([
     'S-h'

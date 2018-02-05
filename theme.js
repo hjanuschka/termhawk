@@ -12,6 +12,10 @@ var Theme = {
         fg: 'black'
     },
     styles: {
+        label: {
+            bg: 'lightgrey',
+            fg: 'black'
+        },
         button: {
             bg: 'lightblue',
             fg: 'red',
