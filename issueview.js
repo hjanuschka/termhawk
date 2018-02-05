@@ -474,6 +474,7 @@ class IssueView {
                 })
                 //FIXME history
 
+                self.root.screen.hawk.addHistory(commitList)
                 commitList.focus()
                 self.box.screen.render()
 
@@ -515,12 +516,6 @@ class IssueView {
             _reviewbox.on('hawk_done', function() {
                 //Fixme scroll to end
                 self.loadData()
-            })
-            _reviewbox.on('reparent', function() {
-                self.root.screen.debug('REPARENT1')
-                setTimeout(() => {
-                    self.box.focus()
-                })
             })
         })
 
