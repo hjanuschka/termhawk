@@ -37,11 +37,11 @@ screen.hawk = {
         this.history.push(el)
     },
     goBack: function() {
-        screen.debug("GO BACK")
+        screen.debug('GO BACK')
         var popped = this.history.pop()
-        //Remove top element
+            //Remove top element
         this.screen.remove(popped)
-        //focus prev.
+            //focus prev.
         var el = this.history.last()
         screen.render()
         setTimeout(() => {
@@ -90,9 +90,9 @@ screen.key(['e'], function(ch, key) {
     notify_view.remove()
 })
 screen.key([
-    'w'
-], function(ch, key) {})
-// Quit on Escape, q, or Control-C.
+        'w'
+    ], function(ch, key) {})
+    // Quit on Escape, q, or Control-C.
 screen.key([
     'escape',
     'q',
@@ -137,6 +137,14 @@ screen.debug('log')
 screen.debug(a)
 
 
+screen.on('keypress', function(ch, key) {
+    if (key.name == 'down' || key.name == 'up') {
+        if (screen.focus !== screen.hawk.history.last()) {
+            var l = screen.hawk.history.last()
+            l.focus()
+        }
+    }
+})
 
 // Render the screen.
 screen.render()
