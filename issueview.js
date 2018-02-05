@@ -46,7 +46,7 @@ class IssueView {
 
         if (self.state.issue) {
 
-        self.root.screen.hawk.setStatus('Issue: ' + this.state.issue.title)
+            self.root.screen.hawk.setStatus('Issue: ' + this.state.issue.title)
             var kind = 'Issue'
             var pr_info = ''
             if (this.state.issue.is_pr) {
@@ -145,7 +145,7 @@ class IssueView {
         }
         self.box.setContent('')
         self.box.focus()
-				this.box.screen.hawk.front()
+        this.box.screen.hawk.front()
         this.box.screen.render()
     }
     walkComments(depth = 0, childs, pointZero = 0, lastReviewId = false) {
@@ -158,199 +158,199 @@ class IssueView {
         }
         childs.forEach(function(entryPayload) {
 
-            var cnt = ''
-            if (entryPayload.type == 'event') {
-                if (['comment_deleted', 'subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
-                    return
-                }
-                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.event.actor.login + '{/}\n'
-                cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.event.created_at + '{/}\n'
-                var handled = false
-                if (entryPayload.event.event == 'labeled') {
-                    cnt += depthspacer + ' added label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
-                    handled = true
+                var cnt = ''
+                if (entryPayload.type == 'event') {
+                    if (['comment_deleted', 'subscribed', 'mentioned', 'referenced'].includes(entryPayload.event.event)) {
+                        return
+                    }
+                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.event.actor.login + '{/}\n'
+                    cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.event.created_at + '{/}\n'
+                    var handled = false
+                    if (entryPayload.event.event == 'labeled') {
+                        cnt += depthspacer + ' added label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
+                        handled = true
+
+                    }
+                    if (entryPayload.event.event == 'unlabeled') {
+                        cnt += depthspacer + ' removed label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
+                        handled = true
+
+                    }
+
+                    if (entryPayload.event.event == 'review_requested') {
+                        cnt += depthspacer + ' Requested review from {bold}' + entryPayload.event.requested_reviewer.login + '{/} \n'
+                        handled = true
+                    }
+                    if (entryPayload.event.event == 'closed') {
+                        cnt += depthspacer + '  clossed this! \n'
+                        handled = true
+                    }
+
+                    if (entryPayload.event.event == 'renamed') {
+                        cnt += depthspacer + ' Renamed from: \'' + entryPayload.event.rename.from + '\' \n'
+                        cnt += depthspacer + '           to: \'' + entryPayload.event.rename.to + '\' \n'
+                        handled = true
+                    }
+                    if (entryPayload.event.event == 'merged') {
+                        cnt += depthspacer + ' merged this! \n'
+                        handled = true
+                    }
+                    if (entryPayload.event.event == 'head_ref_deleted') {
+                        cnt += depthspacer + ' PR branch removed \n'
+                        handled = true
+                    }
+                    if (handled === false) {
+                        cnt += depthspacer + ' ' + JSON.stringify(entryPayload.event, null, 2) + '\n'
+                    }
 
                 }
-                if (entryPayload.event.event == 'unlabeled') {
-                    cnt += depthspacer + ' removed label: {#' + entryPayload.event.label.color + '-bg}' + entryPayload.event.label.name + '{/}\n'
-                    handled = true
+                if (entryPayload.comment.type == 'issue_comment') {
 
-                }
-
-                if (entryPayload.event.event == 'review_requested') {
-                    cnt += depthspacer + ' Requested review from {bold}' + entryPayload.event.requested_reviewer.login + '{/} \n'
-                    handled = true
-                }
-                if (entryPayload.event.event == 'closed') {
-                    cnt += depthspacer + '  clossed this! \n'
-                    handled = true
-                }
-
-                if (entryPayload.event.event == 'renamed') {
-                    cnt += depthspacer + ' Renamed from: \'' + entryPayload.event.rename.from + '\' \n'
-                    cnt += depthspacer + '           to: \'' + entryPayload.event.rename.to + '\' \n'
-                    handled = true
-                }
-                if (entryPayload.event.event == 'merged') {
-                    cnt += depthspacer + ' merged this! \n'
-                    handled = true
-                }
-                if (entryPayload.event.event == 'head_ref_deleted') {
-                    cnt += depthspacer + ' PR branch removed \n'
-                    handled = true
-                }
-                if (handled === false) {
-                    cnt += depthspacer + ' ' + JSON.stringify(entryPayload.event, null, 2) + '\n'
-                }
-
-            }
-            if (entryPayload.comment.type == 'issue_comment') {
-
-                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
-                cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
-                cnt += depthspacer + '--------------------------------------------------------------------------\n'
-                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-
-            }
-            if (entryPayload.comment.type == 'pr_review') {
-                lastReviewId = entryPayload.comment.id
-                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: ' + entryPayload.comment.id + ' {underline}' + entryPayload.comment.submitted_at + '{/}\n'
-                cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
-                cnt += depthspacer + '--------------------------------------------------------------------------\n'
-
-
-                //depth = depth + 1
-                depthspacer = Array(depth).join('\t')
-
-
-                if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
-                    var diff_lines = entryPayload.comment.diff_hunk.split('\n')
-                    diff_lines.forEach(function(l, idx) {
-                        var color = '{white-fg}'
-                        if (l.match(/^\-/)) {
-                            color = '{red-fg}'
-                        }
-                        if (l.match(/^\+/)) {
-                            color = '{green-fg}'
-                        }
-                        cnt += depthspacer + color + l + '{/}\n'
-                        if (idx == entryPayload.comment.original_position) {
-                            cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-                        }
-
-                    })
-                } else {
+                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
+                    cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+                    cnt += depthspacer + '--------------------------------------------------------------------------\n'
                     cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+
                 }
+                if (entryPayload.comment.type == 'pr_review') {
+                    lastReviewId = entryPayload.comment.id
+                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/} submitted review: ' + entryPayload.comment.id + ' {underline}' + entryPayload.comment.submitted_at + '{/}\n'
+                    cnt += depthspacer + '{white-bg}{black-fg}Review Added{/}: ' + entryPayload.comment.state + '\n'
+                    cnt += depthspacer + '--------------------------------------------------------------------------\n'
 
 
-            }
-            if (entryPayload.comment.type == 'pr_comment') {
+                    //depth = depth + 1
+                    depthspacer = Array(depth).join('\t')
 
-                cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
-                cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
-                cnt += depthspacer + '--------------------------------------------------------------------------\n'
-                if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
-                    var diff_lines = entryPayload.comment.diff_hunk.split('\n')
-                    var added_it = false
-                    diff_lines.forEach(function(l, idx) {
-                        var color = '{black-bg}{white-fg}'
-                        if (l.match(/^\-/)) {
-                            color = '{black-bg}{red-fg}'
-                        }
-                        if (l.match(/^\+/)) {
-                            color = '{black-bg}{green-fg}'
-                        }
-                        cnt += depthspacer + color + l + '{/}{/}\n'
-                        if (idx == entryPayload.comment.original_position) {
-                            cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
-                            added_it = true
-                        }
 
-                    })
-                    if (!added_it) {
+                    if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
+                        var diff_lines = entryPayload.comment.diff_hunk.split('\n')
+                        diff_lines.forEach(function(l, idx) {
+                            var color = '{white-fg}'
+                            if (l.match(/^\-/)) {
+                                color = '{red-fg}'
+                            }
+                            if (l.match(/^\+/)) {
+                                color = '{green-fg}'
+                            }
+                            cnt += depthspacer + color + l + '{/}\n'
+                            if (idx == entryPayload.comment.original_position) {
+                                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                            }
+
+                        })
+                    } else {
                         cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
                     }
-                } else {
-                    cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+
+
+                }
+                if (entryPayload.comment.type == 'pr_comment') {
+
+                    cnt += depthspacer + '{#00ff00-fg}User:{/} {underline}' + entryPayload.comment.user.login + '{/}\n'
+                    cnt += depthspacer + '{#00ff00-fg}Created:{/} {underline}' + entryPayload.comment.created_at + '{/}\n'
+                    cnt += depthspacer + '--------------------------------------------------------------------------\n'
+                    if (entryPayload.comment.diff_hunk && !entryPayload.comment.in_reply_to_id) {
+                        var diff_lines = entryPayload.comment.diff_hunk.split('\n')
+                        var added_it = false
+                        diff_lines.forEach(function(l, idx) {
+                            var color = '{black-bg}{white-fg}'
+                            if (l.match(/^\-/)) {
+                                color = '{black-bg}{red-fg}'
+                            }
+                            if (l.match(/^\+/)) {
+                                color = '{black-bg}{green-fg}'
+                            }
+                            cnt += depthspacer + color + l + '{/}{/}\n'
+                            if (idx == entryPayload.comment.original_position) {
+                                cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                                added_it = true
+                            }
+
+                        })
+                        if (!added_it) {
+                            cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                        }
+                    } else {
+                        cnt += depthspacer + striptags(marked(entryPayload.comment.body)) + '\n'
+                    }
+
+
                 }
 
 
-            }
 
 
-
-
-            var box2 = blessed.box({
-                left: (depth * 1) + 1,
-                width: '100%-' + (depth * 1) + 4,
-                height: 'shrink',
-                border: 'line',
-                padding: {
-                    left: 2,
-                    top: 2,
-                },
-                tags: true,
-                shrink: true,
-                top: self.offset,
-                content: cnt,
-                shadow: true,
-                parent: self.box,
-
-                style: theme.styles.box,
-                astyle: {
-                    border: {
-                        fg: theme.primary.bg,
-                        bg: theme.primary.fg
+                var box2 = blessed.box({
+                    left: (depth * 1) + 1,
+                    width: '100%-' + (depth * 1) + 4,
+                    height: 'shrink',
+                    border: 'line',
+                    padding: {
+                        left: 2,
+                        top: 2,
                     },
-                    bg: theme.primary.bg,
-                    fg: theme.primary.fg
+                    tags: true,
+                    shrink: true,
+                    top: self.offset,
+                    content: cnt,
+                    shadow: true,
+                    parent: self.box,
+
+                    style: theme.styles.box,
+                    astyle: {
+                        border: {
+                            fg: theme.primary.bg,
+                            bg: theme.primary.fg
+                        },
+                        bg: theme.primary.bg,
+                        fg: theme.primary.fg
+                    }
+
+                })
+
+                box2.parseContent()
+                if (box2 && box2._clines) {
+                    self.offset += box2._clines.length + 3 + 2 + 1
+                } else {
+                    //FIXME double renderer?
+                    return
                 }
 
+
+
+                if (entryPayload.children && entryPayload.children.length > 0) {
+                    //console.error("CHILD", entryPayload)
+                    lastReviewId = entryPayload.children[entryPayload.children.length - 1].comment.id
+                    self.walkComments(depth + 1, entryPayload.children, 0, lastReviewId)
+                }
+                var btn1 = blessed.button({
+                        left: 'center',
+
+                        style: theme.styles.button,
+
+
+                        top: self.offset - 3,
+                        width: 'shrink',
+                        height: 1,
+                        tags: true,
+                        content: 'reply',
+                        mouse: true,
+                        keys: true,
+                        parent: self.box
+                    })
+                    //btn1.reply_to = entryPayload.children[entryPayload.children.length - 1].comment.id
+                btn1.reply_to = lastReviewId
+
+                btn1.on('press', function() {
+                    var _replybox = new ReplyBox(self.root, self.driver, self.payload)
+                    _replybox.setType('pr_review')
+                    _replybox.setReplyTo(this.reply_to)
+                    _replybox.createView()
+                })
+                self.buttons.push(btn1)
             })
-
-            box2.parseContent()
-            if (box2 && box2._clines) {
-                self.offset += box2._clines.length + 3 + 2 + 1
-            } else {
-                //FIXME double renderer?
-                return
-            }
-
-
-
-            if (entryPayload.children && entryPayload.children.length > 0) {
-                //console.error("CHILD", entryPayload)
-                lastReviewId = entryPayload.children[entryPayload.children.length - 1].comment.id
-                self.walkComments(depth + 1, entryPayload.children, 0, lastReviewId)
-            }
-            var btn1 = blessed.button({
-                left: 'center',
-
-                style: theme.styles.button,
-
-
-                top: self.offset - 3,
-                width: 'shrink',
-                height: 1,
-                tags: true,
-                content: 'reply',
-                mouse: true,
-                keys: true,
-                parent: self.box
-            })
-            //btn1.reply_to = entryPayload.children[entryPayload.children.length - 1].comment.id
-            btn1.reply_to = lastReviewId
-
-            btn1.on('press', function() {
-                var _replybox = new ReplyBox(self.root, self.driver, self.payload)
-                _replybox.setType('pr_review')
-                _replybox.setReplyTo(this.reply_to)
-                _replybox.createView()
-            })
-            self.buttons.push(btn1)
-        })
-        //return cnt
+            //return cnt
 
     }
     createView() {
@@ -373,7 +373,7 @@ class IssueView {
             'input': true,
             'keys': true,
             'content': 'Loading....',
-            'height': '100%-1',
+            'height': '100%',
             'width': '100%',
             'top': 0,
             'left': 0,
@@ -389,6 +389,7 @@ class IssueView {
         })
         this.box.enableInput()
         this.events()
+        this.root.screen.hawk.front()
         this.reRender()
 
         this.loadData()
@@ -474,7 +475,6 @@ class IssueView {
                     self.box.screen.render()
                 })
 
-
                 commitList.focus()
                 self.box.screen.render()
 
@@ -516,6 +516,12 @@ class IssueView {
             _reviewbox.on('hawk_done', function() {
                 //Fixme scroll to end
                 self.loadData()
+            })
+            _reviewbox.on('reparent', function() {
+                self.root.screen.debug('REPARENT1')
+                setTimeout(() => {
+                    self.box.focus()
+                })
             })
         })
 

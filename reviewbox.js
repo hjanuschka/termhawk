@@ -180,6 +180,28 @@ class ReviewBox extends EventEmitter {
                 }
             }
         })
+        var cancel = blessed.button({
+            parent: self.form,
+            mouse: true,
+            keys: true,
+            shrink: true,
+            padding: {
+                left: 1,
+                right: 1
+            },
+            left: 34,
+            top: 20,
+            name: 'cancel',
+            content: 'cancel',
+            style: {
+                bg: 'blue',
+                focus: {
+                    bg: 'red'
+                }
+            }
+        })
+
+
 
         var commentCount = blessed.text({
             parent: self.form,
@@ -194,7 +216,7 @@ class ReviewBox extends EventEmitter {
         })
 
         cr.on('press', function() {
-            self.root.screen.debug("PRESS")
+            self.root.screen.debug('PRESS')
             var diffViewer = new ReviewDiffBox(self.root, self.driver, {})
             fetch(self.diffUrl)
                 .then(function(res) {
@@ -218,6 +240,11 @@ class ReviewBox extends EventEmitter {
             self.form.submit()
         })
 
+        cancel.on('press', function() {
+            self.root.remove(self.form)
+            self.root.screen.render()
+            self.emit('reparent')
+        })
         text.on('focus', function() {
             text.readInput()
         })
@@ -229,6 +256,7 @@ class ReviewBox extends EventEmitter {
         self.form.key(['h'], function() {
             self.root.remove(self.form)
             self.root.screen.render()
+            self.emit('reparent')
         })
         self.root.screen.render()
 
