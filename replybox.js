@@ -49,6 +49,7 @@ class ReplyBox extends EventEmitter {
             shadow: true,
             style: theme.styles.box
         })
+        this.root.screen.hawk.addHistory(self.form)
         self.form.on('submit', function(data) {
             if (self.submit) {
                 self.submit(data)
@@ -120,10 +121,6 @@ class ReplyBox extends EventEmitter {
             //text.readEditor(function(err, data) {})
         })
 
-        self.form.key(['h'], function() {
-            self.root.remove(self.form)
-            self.root.screen.render()
-        })
         self.root.screen.render()
 
     }

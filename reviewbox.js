@@ -46,7 +46,8 @@ class ReviewBox extends EventEmitter {
             shadow: true,
             style: theme.styles.box
         })
-        self.root.screen.hawk.addHistory(self.form)
+
+        this.root.screen.hawk.addHistory(self.form)
         self.form.on('submit', function(data) {
             var state = 'PENDING'
             if (data.REQUEST_CHANGES) {
@@ -242,8 +243,7 @@ class ReviewBox extends EventEmitter {
         })
 
         cancel.on('press', function() {
-            self.root.remove(self.form)
-            self.root.screen.render()
+            self.root.screen.hawk.goBack();
         })
         text.on('focus', function() {
             text.readInput()
