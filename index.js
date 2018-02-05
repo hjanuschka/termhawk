@@ -22,6 +22,9 @@ var bottom_bar = new BottomBar(screen)
 screen.hawk = {
   setStatus: function(t) {
     bottom_bar.setStatus(t); 
+  },
+  front: function() {
+    bottom_bar.view.setFront()
   }
 }
 
@@ -32,11 +35,13 @@ screen.title = 'TermHawk'
 var driver = new gitDriver()
 
 
+bottom_bar.createView()
+screen.hawk.front()
 
 if (process.env.issue_test) {
     var issue_view = new issueView(screen, driver, {
         repo: 'hjanuschka/termhawk',
-        id: 3
+        id: 1
     })
     issue_view.createView()
     issue_view.focus()
@@ -49,7 +54,7 @@ if (process.env.issue_test) {
 }
 
 
-bottom_bar.createView()
+
 
 
 

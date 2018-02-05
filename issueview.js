@@ -84,7 +84,7 @@ class IssueView {
                 shrink: true,
                 tags: true,
                 border: 'line',
-                width: '100%-3',
+                width: '100%-1',
                 height: 'shrink',
                 padding: {
                     left: 2,
@@ -145,6 +145,7 @@ class IssueView {
         }
         self.box.setContent('')
         self.box.focus()
+				this.box.screen.hawk.front()
         this.box.screen.render()
     }
     walkComments(depth = 0, childs, pointZero = 0, lastReviewId = false) {
