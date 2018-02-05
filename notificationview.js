@@ -1,6 +1,6 @@
 var blessed = require('blessed')
 var IssueView = require('./issueview')
-var theme = require("./theme")
+var theme = require('./theme')
 
 class NotificationView {
     constructor(root, driver) {
@@ -43,7 +43,11 @@ class NotificationView {
     }
     loadData() {
         var self = this
-        self.driver.getNotifications({all: false, page: 1, per_page: 100})
+        self.driver.getNotifications({
+                all: false,
+                page: 1,
+                per_page: 100
+            })
             .then(function(notifications) {
                 self.setState({
                     notifications: notifications,
@@ -67,9 +71,8 @@ class NotificationView {
             'height': '100%-3',
             'mouse': true,
             'width': '100%-3',
-          'style': theme.styles.box
-        }
-        )
+            'style': theme.styles.box
+        })
         this.events()
         this.loadData()
 
@@ -109,16 +112,22 @@ class NotificationView {
             var not = self.state.notifications[index - 1]
 
             var id = not.target_id
-            //not.repo ='hjanuschka/termhawk'
-            //id=1;
-            //not.repo = 'fastlane/fastlane'
-            //id=11418
+                //not.repo ='hjanuschka/termhawk'
+                //id=1;
+                //not.repo = 'fastlane/fastlane'
+                //id=11418
             var issue = new IssueView(self.root, self.driver, {
                 repo: not.repo,
                 id: id
             })
             issue.createView()
             issue.focus()
+            issue.box.on('reparent', function() {
+                setTimeout(() => {
+                    self.root.screen.debug('REFOCUS notifications')
+                    self.table.focus()
+                }, 0)
+            })
         })
 
     }
