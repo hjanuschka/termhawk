@@ -103,7 +103,8 @@ class ReviewDiffBox extends EventEmitter {
         })
 
 
-        self.box.key(['h', 's'], function() {
+        this.root.screen.hawk.addHistory(self.box)
+        self.box.key(['s'], function() {
             self.emit('review_done', self.reviews)
             self.removeMe()
         })
