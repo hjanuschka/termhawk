@@ -41,13 +41,9 @@ class MDBox extends EventEmitter {
             scrollable: true,
         })
 
+        self.root.screen.hawk.addHistory(self.box)
         var about = fs.readFileSync(self.file, 'utf8')
         self.box.setContent(marked(about.toString()))
-
-        self.box.key(['h'], function() {
-            self.root.remove(self.box)
-            self.root.screen.render()
-        })
 
         self.box.focus()
         self.root.screen.render()
