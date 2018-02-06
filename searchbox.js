@@ -17,7 +17,7 @@ class SearchBox extends EventEmitter {
     }
     createView() {
         var self = this
-        self.box = blessed.box({
+        self.box = blessed.form({
             parent: self.root,
             mouse: true,
             keys: true,
@@ -29,7 +29,7 @@ class SearchBox extends EventEmitter {
             top: 'center',
             width: '100%',
             height: '100%',
-            inputOnFocus: true,
+            //inputOnFocus: true,
             border: 'line',
             content: '',
             scrollable: true,
@@ -75,7 +75,7 @@ class SearchBox extends EventEmitter {
             content: 'Search '
         })
 
-var list = blessed.list({
+        var list = blessed.list({
             parent: self.box,
             mouse: true,
             keys: true,
@@ -84,28 +84,27 @@ var list = blessed.list({
             left: 'center',
             top: 12,
             border: false,
-            content: "",
+            content: '',
             'style': theme.styles.box,
             padding: {
-            left: 10,
-            right: 10
+                left: 10,
+                right: 10
             }
         })
+
         //list.setItems([1,2,34,5,6,7]);
-        list.addItem("1");
-        list.addItem("2");
-        list.addItem("3");
-        list.addItem("4");
+        list.addItem('1')
+        list.addItem('2')
+        list.addItem('3')
+        list.addItem('4')
 
 
 
 
-        self.box.key(['h'], function() {
-            self.root.remove(self.box)
-            self.root.screen.render()
-        })
 
         self.box.focus()
+        self.box.ignoreAutoFocus = true
+        self.root.screen.hawk.addHistory(self.box)
         self.root.screen.render()
 
     }
