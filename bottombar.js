@@ -13,9 +13,9 @@ class BottomBar {
         this.view.screen.render()
     }
     setStatus(t) {
-      if(!this.view) return;
-      this.view.setContent(t);
-      this.view.screen.render();
+        if(!this.view) return
+        this.view.setContent(t)
+        this.view.screen.render()
     }
     createView() {
         var self = this

@@ -1,6 +1,6 @@
 var Blessed = require('blessed')
 var fs = require('fs')
-var ReviewDiffBox = require("./reviewdiffbox")
+var ReviewDiffBox = require('./reviewdiffbox')
 
 var screen = Blessed.screen({
     smartCSR: true,
@@ -14,6 +14,6 @@ screen.key('q', function() {
 
 var diff_data = fs.readFileSync('./demo.diff', 'utf8')
 var _reviewdiffbox = new ReviewDiffBox(screen, null, {})
-_reviewdiffbox.setDiff(diff_data.toString());
-_reviewdiffbox.createView();
+_reviewdiffbox.setDiff(diff_data.toString())
+_reviewdiffbox.createView()
 screen.render()

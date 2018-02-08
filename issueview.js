@@ -43,10 +43,10 @@ class IssueView {
     statusBox() {
         var self = this
         var cnt = ''
-      if(!self.state.pr.statuses) {
-        return;
-      }
-      /*
+        if(!self.state.pr.statuses) {
+            return
+        }
+        /*
        *
        *
 
@@ -56,13 +56,14 @@ class IssueView {
         |   |   |   |   |   |
         |   |   |   |   |   |
        */
-      cnt += "Overall: {bold} " + self.state.pr.statuses.state + "{/}\n"
-      self.state.pr.statuses.statuses.forEach(function(st) {
-        cnt +=  st.description + " (" + st.updated_at + ")\n"
-        var cl = 'red-fg';
-        if(st.state == "success") cl = 'green-fg'
-        cnt += "\t {"+cl+"}" + st.state + "{/}\n"
-      })
+        cnt += '{red-fg} Statuses: {/}\n'
+        cnt += 'Overall: {bold} ' + self.state.pr.statuses.state + '{/}\n'
+        self.state.pr.statuses.statuses.forEach(function(st) {
+            cnt +=  st.context + ' (' + st.updated_at + ')\n'
+            var cl = 'red-fg'
+            if(st.state == 'success') cl = 'green-fg'
+            cnt += '\t {bold}{'+cl+'}' + st.state + '{/}\n'
+        })
 
         var box1 = blessed.box({
             shrink: true,
@@ -75,7 +76,6 @@ class IssueView {
                 top: 2,
                 right: 0
             },
-            label: "Statuses",
             parent: self.box,
             top: self.offset,
             shadow: true,

@@ -3,8 +3,8 @@ var TerminalRenderer = require('marked-terminal')
 var blessed = require('blessed')
 var EventEmitter = require('events')
 var fs = require('fs')
-var theme = require("./theme")
-var chalk = require("chalk")
+var theme = require('./theme')
+var chalk = require('chalk')
 
 marked.setOptions({
     //  Define custom renderer
@@ -29,7 +29,7 @@ class MDBox extends EventEmitter {
             mouse: true,
             keys: true,
             shadow: true,
-          style:theme.styles.box,
+            style:theme.styles.box,
             vi: true,
             label: 'Termhawk',
             left: 'center',
