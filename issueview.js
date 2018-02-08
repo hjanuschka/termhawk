@@ -53,7 +53,10 @@ class IssueView {
                 var mergeable = 'false'
                 if (this.state.pr.mergeable) mergeable = 'true'
                 kind = 'Pull Request'
-                pr_info += '{underline}Mergable{/}:' + mergeable + '\n'
+                pr_info += '{underline}Mergeable{/}:' + mergeable + '\n'
+                if(this.state.pr.statuses) {
+                  pr_info += '{underline}Status{/}:' + this.state.pr.statuses.state + '\n'
+                }
                 pr_info += '{underline}Diff Stat{/}: Removes: {red-fg}' + this.state.pr.deletions + '{/} '
 
                 pr_info += 'Adds: {green-fg}' + this.state.pr.additions + '{/} \n\n'
@@ -392,8 +395,6 @@ class IssueView {
         this.box.enableInput()
         this.events()
         this.root.screen.hawk.front()
-        this.reRender()
-
         this.loadData()
 
     }
@@ -402,6 +403,7 @@ class IssueView {
         self.driver.getIssueTimeline(self.payload.repo, self.payload.id)
             .then(function(issueData) {
                 self.setState(issueData)
+                self.root.screen.debug(JSON.stringify(issueData.pr_statuses.state, false, 2))
             })
         return
     }

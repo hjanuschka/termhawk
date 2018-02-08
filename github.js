@@ -35,7 +35,7 @@ class GithubDriver {
                 body: payload.reviews[key].comment,
             })
         }
-      //console.log(comments)
+        //console.log(comments)
         return octokit.pullRequests.createReview({
             owner: a[0],
             repo: a[1],
@@ -54,7 +54,9 @@ class GithubDriver {
             number: id,
             body: payload.body,
             in_reply_to: payload.in_reply_to
-        }).catch(function(e) {console.log(e)});
+        }).catch(function(e) {
+            console.log(e)
+        });
 
     }
     createIssueComment(repo, id, payload) {
@@ -269,7 +271,21 @@ class GithubDriver {
                 newState.pr_comments = pr_comments
                 return Promise.resolve()
             })
-            .then(() => self.loadIssueComments(repo, id))
+            .then(() => {
+
+                if (newState.issue.is_pr) {
+                    return self.loadCombinedStatuses(repo, newState.pr.head.sha)
+
+                } else {
+                    return Promise.resolve([])
+                }
+            })
+            .then(function(pr_statuses) {
+                newState.pr.statuses = pr_statuses
+                return Promise.resolve()
+            })
+
+        .then(() => self.loadIssueComments(repo, id))
             .then(function(issue_comments) {
                 newState.issue_comments = issue_comments
                 return Promise.resolve()
@@ -329,6 +345,20 @@ class GithubDriver {
             return Promise.resolve(events);
         })
     }
+    loadCombinedStatuses(repo, ref) {
+
+        var self = this
+        var a = repo.split("/");
+        return octokit.repos.getCombinedStatusForRef({
+                owner: a[0],
+                repo: a[1],
+                ref: ref
+            })
+            .then(result => {
+                return Promise.resolve(result.data)
+            })
+
+    }
     loadPRComments(repo, id) {
         var self = this
         var a = repo.split("/");
@@ -387,19 +417,18 @@ class GithubDriver {
                 var transformed = []
                 notifications.forEach(function(noti) {
                     var matches = noti.subject.url.match(/.*\/([0-9]+$)/)
-                  if(matches) {
-                    transformed.push({
-                        id: noti.id,
-                        title: noti.subject.title,
-                        repo: noti.repository.full_name,
-                        target_id: matches[1]
-                    })
+                    if (matches) {
+                        transformed.push({
+                            id: noti.id,
+                            title: noti.subject.title,
+                            repo: noti.repository.full_name,
+                            target_id: matches[1]
+                        })
 
-                  } else {
-                    //WOOT
-                  }
-                }
-                )
+                    } else {
+                        //WOOT
+                    }
+                })
                 return Promise.resolve(transformed);
 
             });
