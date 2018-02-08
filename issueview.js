@@ -40,6 +40,67 @@ class IssueView {
         this.state = state
         this.reRender()
     }
+    statusBox() {
+        var self = this
+        var cnt = ''
+      if(!self.state.pr.statuses) {
+        return;
+      }
+      /*
+       *
+       *
+
+       |   |   |   |   |   |
+       |---|---|---|---|---|
+        |   |   |   |   |   |
+        |   |   |   |   |   |
+        |   |   |   |   |   |
+       */
+      cnt += "Overall: {bold} " + self.state.pr.statuses.state + "{/}\n"
+      self.state.pr.statuses.statuses.forEach(function(st) {
+        cnt +=  st.description + " (" + st.updated_at + ")\n"
+        var cl = 'red-fg';
+        if(st.state == "success") cl = 'green-fg'
+        cnt += "\t {"+cl+"}" + st.state + "{/}\n"
+      })
+
+        var box1 = blessed.box({
+            shrink: true,
+            tags: true,
+            border: 'line',
+            width: '100%-1',
+            height: 'shrink',
+            padding: {
+                left: 2,
+                top: 2,
+                right: 0
+            },
+            label: "Statuses",
+            parent: self.box,
+            top: self.offset,
+            shadow: true,
+            left: 1,
+
+            style: theme.styles.box,
+            astyle: {
+                border: {
+                    fg: theme.primary.bg,
+                    bg: theme.primary.fg
+                },
+                bg: theme.primary.bg,
+                fg: theme.primary.fg
+            }
+
+        })
+
+        box1.setContent(cnt)
+        box1.parseContent()
+        if (box1._clines) {
+            self.offset += box1._clines.length + 3 + 2 + 1
+        }
+
+
+    }
     reRender() {
         var self = this
 
@@ -54,8 +115,8 @@ class IssueView {
                 if (this.state.pr.mergeable) mergeable = 'true'
                 kind = 'Pull Request'
                 pr_info += '{underline}Mergeable{/}:' + mergeable + '\n'
-                if(this.state.pr.statuses) {
-                  pr_info += '{underline}Status{/}:' + this.state.pr.statuses.state + '\n'
+                if (this.state.pr.statuses) {
+                    pr_info += '{underline}Status{/}:' + this.state.pr.statuses.state + '\n'
                 }
                 pr_info += '{underline}Diff Stat{/}: Removes: {red-fg}' + this.state.pr.deletions + '{/} '
 
@@ -120,6 +181,7 @@ class IssueView {
             }
 
 
+            self.statusBox()
             self.walkComments(0, this.state.timeline)
 
 
@@ -403,7 +465,6 @@ class IssueView {
         self.driver.getIssueTimeline(self.payload.repo, self.payload.id)
             .then(function(issueData) {
                 self.setState(issueData)
-                self.root.screen.debug(JSON.stringify(issueData.pr_statuses.state, false, 2))
             })
         return
     }
@@ -554,8 +615,8 @@ class IssueView {
                 } else {
                     self.selectedButton = 0
                 }
-                self.root.screen.debug("SELECT: " +  self.selectedButton)
-                self.root.screen.rewindFocus();
+                self.root.screen.debug('SELECT: ' + self.selectedButton)
+                self.root.screen.rewindFocus()
                 self.buttons[self.selectedButton].focus()
                 self.root.screen.render()
             }
