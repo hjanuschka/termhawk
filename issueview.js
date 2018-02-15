@@ -552,6 +552,8 @@ class IssueView {
                 } else {
                     self.selectedButton = 0
                 }
+                self.root.screen.debug("SELECT: " +  self.selectedButton)
+                self.root.screen.rewindFocus();
                 self.buttons[self.selectedButton].focus()
                 self.root.screen.render()
             }

@@ -48,10 +48,7 @@ class DiffBox {
             shadow: true,
             style: theme.styles.box
         })
-        diffBox.key(['h'], function() {
-            self.root.remove(diffBox)
-            self.root.screen.render()
-        })
+        this.root.screen.hawk.addHistory(diffBox)
         diffBox.focus()
         self.root.screen.render()
 

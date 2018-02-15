@@ -60,10 +60,13 @@ class ReviewBox extends EventEmitter {
                 state = 'COMMENT'
             }
             //console.log(data, self.reviews)
-            self.driver.createPRReview(self.payload.repo, self.payload.id, {text: data.text,state: state, reviews: self.reviews})
+            self.driver.createPRReview(self.payload.repo, self.payload.id, {
+                text: data.text,
+                state: state,
+                reviews: self.reviews
+            })
                 .then(function() {
-                    self.root.remove(self.form)
-                    self.root.screen.render()
+                    self.root.screen.goBack()
                 })
         })
 
@@ -243,7 +246,7 @@ class ReviewBox extends EventEmitter {
         })
 
         cancel.on('press', function() {
-            self.root.screen.hawk.goBack();
+            self.root.screen.hawk.goBack()
         })
         text.on('focus', function() {
             text.readInput()
